@@ -160,13 +160,12 @@ def _extract_text_via_pymupdf_ocr(file_bytes: bytes) -> str:
         import fitz  # PyMuPDF
         import pytesseract
         from PIL import Image
-        import io as _io
 
         doc = fitz.open(stream=file_bytes, filetype="pdf")
         pages_text = []
         for page in doc:
             pix = page.get_pixmap(dpi=150)
-            img = Image.open(_io.BytesIO(pix.tobytes("png")))
+            img = Image.open(io.BytesIO(pix.tobytes("png")))
             pages_text.append(pytesseract.image_to_string(img, lang="por"))
         return "\n".join(pages_text)
     except Exception as exc:

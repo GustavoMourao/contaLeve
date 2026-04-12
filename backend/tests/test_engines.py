@@ -1,4 +1,6 @@
 """Tests for the tariff and savings engines."""
+import pytest
+
 from app.services.tariff_engine import calculate_monthly_cost
 from app.services.savings_engine import calculate_savings, run_simulation
 from app.models import Supplier
@@ -28,6 +30,3 @@ def test_run_simulation_best_is_cheapest():
     assert result["best_option"].supplier.name == "B"
     assert result["best_option"].monthly_savings > 0
     assert len(result["all_options"]) == 2
-
-
-import pytest
