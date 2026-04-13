@@ -1,6 +1,7 @@
 import { UploadBillResponse, SimulationResponse, Supplier } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Use /api prefix which will be rewritten to backend service by Next.js
+const API_BASE = "/api";
 
 export async function uploadBill(file: File): Promise<UploadBillResponse> {
   const form = new FormData();
