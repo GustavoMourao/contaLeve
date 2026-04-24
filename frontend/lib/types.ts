@@ -18,6 +18,15 @@ export interface Supplier {
   created_at: string;
 }
 
+export interface Partner {
+  id: number;
+  name: string;
+  slug: string;
+  website: string | null;
+  logo_url: string | null;
+  description: string | null;
+}
+
 export interface SupplierSimulationResult {
   supplier: Supplier;
   monthly_cost: number;
@@ -35,4 +44,40 @@ export interface SimulationResponse {
 export interface UploadBillResponse {
   bill: Bill;
   message: string;
+}
+
+export type VoltageLevel = "low" | "medium" | "high";
+export type LeadStatus = "new" | "sent" | "in_negotiation" | "converted" | "lost";
+
+export interface LeadCreate {
+  name: string;
+  email: string;
+  phone?: string;
+  state?: string;
+  city?: string;
+  monthly_kwh: number;
+  current_cost: number;
+  utility?: string;
+  voltage_level: VoltageLevel;
+  estimated_savings?: number;
+  partner_id?: number;
+}
+
+export interface LeadResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  state: string | null;
+  city: string | null;
+  monthly_kwh: number;
+  current_cost: number;
+  utility: string | null;
+  voltage_level: VoltageLevel;
+  estimated_savings: number | null;
+  status: LeadStatus;
+  notes: string | null;
+  partner: Partner | null;
+  created_at: string;
+  updated_at: string;
 }

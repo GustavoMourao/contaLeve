@@ -19,6 +19,9 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    env_file:
+      - path: .env
+        required: false   # start normally even if .env doesn't exist yet
     environment:
       DATABASE_URL: postgresql://contaLeve:contaLeve@db:5432/contaLeve
     depends_on:

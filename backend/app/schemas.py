@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -74,3 +74,58 @@ class SimulationResponse(BaseModel):
 class UploadBillResponse(BaseModel):
     bill: BillResponse
     message: str = "Bill parsed successfully"
+
+
+# ── Partner schemas ───────────────────────────────────────────────────────────
+
+class PartnerResponse(BaseModel):
+    id: int
+    name: str
+    slug: str
+    website: Optional[str] = None
+    logo_url: Optional[str] = None
+    description: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# ── Lead schemas ──────────────────────────────────────────────────────────────
+
+class LeadCreate(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    state: Optional[str] = None
+    city: Optional[str] = None
+    monthly_kwh: float
+    current_cost: float
+    utility: Optional[str] = None
+    voltage_level: str = "low"   # low | medium | high
+    estimated_savings: Optional[float] = None
+    partner_id: Optional[int] = None
+
+
+class LeadStatusUpdate(BaseModel):
+    status: str   # new | sent | in_negotiation | converted | lost
+    notes: Optional[str] = None
+
+
+class LeadResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    phone: Optional[str] = None
+    state: Optional[str] = None
+    city: Optional[str] = None
+    monthly_kwh: float
+    current_cost: float
+    utility: Optional[str] = None
+    voltage_level: str
+    estimated_savings: Optional[float] = None
+    status: str
+    notes: Optional[str] = None
+    partner: Optional[PartnerResponse] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}

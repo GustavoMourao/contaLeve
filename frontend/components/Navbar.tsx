@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Zap, Sparkles } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Início" },
   { href: "/compare", label: "Comparar" },
   { href: "/dashboard", label: "Histórico" },
-  { href: "/pricing", label: "Planos" },
 ];
 
 export default function Navbar() {
@@ -48,13 +47,6 @@ export default function Navbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          <Link
-            href="/pricing"
-            className="flex items-center gap-1.5 text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Upgrade Pro
-          </Link>
           <Link
             href="/"
             className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
@@ -97,14 +89,7 @@ export default function Navbar() {
           >
             Analisar minha conta
           </Link>
-          <Link
-            href="/pricing"
-            onClick={() => setOpen(false)}
-            className="bg-amber-50 text-amber-700 border border-amber-200 text-sm font-semibold px-4 py-2.5 rounded-lg text-center flex items-center justify-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Conhecer o plano Pro
-          </Link>
+
         </div>
       )}
     </header>

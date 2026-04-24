@@ -6,8 +6,8 @@ from sqlalchemy.exc import OperationalError
 
 from app.database import engine, SessionLocal
 from app.models import Base
-from app.routers import bills, suppliers, simulate
-from app.services.supplier_engine import seed_suppliers
+from app.routers import bills, suppliers, simulate, leads, partners
+from app.services.supplier_engine import seed_suppliers, seed_partners
 
 
 @asynccontextmanager
@@ -17,10 +17,10 @@ async def lifespan(app: FastAPI):
         db = SessionLocal()
         try:
             seed_suppliers(db)
+            seed_partners(db)
         finally:
             db.close()
     except OperationalError:
-        # DB not available (e.g. in unit-test environments without Postgres)
         pass
     yield
 
@@ -43,6 +43,8 @@ app.add_middleware(
 app.include_router(bills.router)
 app.include_router(suppliers.router)
 app.include_router(simulate.router)
+app.include_router(leads.router)
+app.include_router(partners.router)
 
 
 @app.get("/health", tags=["health"])
