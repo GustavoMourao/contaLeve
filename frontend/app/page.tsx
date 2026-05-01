@@ -11,12 +11,6 @@ const steps = [
   { Icon: Handshake, n: "03", title: "Conectamos você ao parceiro certo", desc: "Com um clique, encaminhamos seu interesse ao fornecedor mais adequado. Sem custo." },
 ];
 
-const partners = [
-  { name: "Comerc Energia", tag: "Maior trader independente do Brasil", href: "https://www.comerc.com.br" },
-  { name: "Enerlivre", tag: "Especialistas em migração para o ML", href: "https://www.enerlivre.com.br" },
-  { name: "Mercado da Energia", tag: "Plataforma de comparação e contratação", href: "https://www.mercadodeenergia.com.br" },
-];
-
 const why = [
   { Icon: ShieldCheck, title: "Totalmente gratuito", desc: "Você nunca paga nada. Nossa receita vem de comissão dos parceiros quando você fecha contrato." },
   { Icon: Leaf, title: "Apenas parceiros verificados", desc: "Trabalhamos somente com traders e comercializadoras regulamentadas pela ANEEL." },
@@ -67,37 +61,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Partners */}
-      <section className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 md:p-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-slate-900">Nossos parceiros</h2>
-          <p className="text-slate-500 mt-2">Comercializadoras e traders verificados pela ANEEL</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {partners.map((p) => (
-            <a
-              key={p.name}
-              href={p.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center text-center p-6 rounded-2xl border border-slate-200 hover:border-green-400 hover:shadow-md transition-all group"
-            >
-              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-green-100 transition-colors">
-                <Building2 className="w-6 h-6 text-green-700" />
-              </div>
-              <p className="font-bold text-slate-900">{p.name}</p>
-              <p className="text-sm text-slate-500 mt-1">{p.tag}</p>
-            </a>
-          ))}
-        </div>
-        <p className="text-center text-xs text-slate-400 mt-6">
-          Interessado em se tornar parceiro?{" "}
-          <a href="mailto:parcerias@contaleve.com.br" className="text-green-600 hover:underline">
-            Entre em contato →
-          </a>
-        </p>
       </section>
 
       {/* Why us */}
