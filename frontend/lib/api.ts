@@ -1,6 +1,6 @@
 import { UploadBillResponse, SimulationResponse, Supplier, Partner, LeadCreate, LeadResponse } from "./types";
 
-const API_BASE = "/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function uploadBill(file: File): Promise<UploadBillResponse> {
   const form = new FormData();
