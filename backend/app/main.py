@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,19 +10,27 @@ from app.models import Base
 from app.routers import bills, suppliers, simulate, leads, partners
 from app.services.supplier_engine import seed_suppliers, seed_partners
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
+        logger.info("Creating database tables...")
         Base.metadata.create_all(bind=engine)
         db = SessionLocal()
         try:
+            logger.info("Seeding suppliers and partners...")
             seed_suppliers(db)
             seed_partners(db)
+            logger.info("Database initialization complete")
         finally:
             db.close()
-    except OperationalError:
-        pass
+    except OperationalError as e:
+        logger.error(f"Database connection error during startup: {e}")
+        logger.warning("Continuing without database initialization - app will fail on first request")
+    except Exception as e:
+        logger.error(f"Unexpected error during startup: {e}")
     yield
 
 
