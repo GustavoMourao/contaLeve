@@ -27,12 +27,13 @@ class BillResponse(BillBase):
 
 class UploadBillResponse(BaseModel):
     bill: BillResponse
-    message: str = "Bill parsed successfully"
+    message: str
+    status: str = "success"  # "success" or "partial"
+    extraction_notes: Optional[str] = None
     kwh_extraction_method: Optional[str] = None
     cost_extraction_method: Optional[str] = None
-    kwh_confidence: str = "high"  # high, low, not_found
-    cost_confidence: str = "high"  # high, low, not_found
-    extraction_notes: Optional[str] = None
+    kwh_confidence: str = "high"
+    cost_confidence: str = "high"
 
 
 # ── Supplier schemas ────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ class SupplierSimulationResult(BaseModel):
     monthly_cost: float
     monthly_savings: float
     yearly_savings: float
-    savings_percentage: float  # e.g., 18.5 for 18.5%
+    savings_percentage: float
 
 
 class SimulationResponse(BaseModel):
@@ -76,10 +77,9 @@ class SimulationResponse(BaseModel):
     monthly_kwh: float
     best_option: SupplierSimulationResult
     all_options: list[SupplierSimulationResult]
-    savings_range: Optional[dict] = None  # {"min": 12, "max": 24} for percentage range
-    estimated_savings_min: float  # Minimum savings percentage
-    estimated_savings_max: float  # Maximum savings percentage
-    recommended_contract_type: str  # e.g., "Fixed-price renewable"
+    estimated_savings_min: float
+    estimated_savings_max: float
+    recommended_contract_type: str
 
     model_config = {"from_attributes": True}
 
