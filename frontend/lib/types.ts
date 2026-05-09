@@ -32,6 +32,7 @@ export interface SupplierSimulationResult {
   monthly_cost: number;
   monthly_savings: number;
   yearly_savings: number;
+  savings_percentage: number;
 }
 
 export interface SimulationResponse {
@@ -39,6 +40,9 @@ export interface SimulationResponse {
   monthly_kwh: number;
   best_option: SupplierSimulationResult;
   all_options: SupplierSimulationResult[];
+  estimated_savings_min: number;
+  estimated_savings_max: number;
+  recommended_contract_type: string;
 }
 
 export interface UploadBillResponse {
