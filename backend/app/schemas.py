@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
-# ── Bill schemas ─────────────────────────────────────────────────────────────
+# ── Bill schemas ──────────────────────────────────────────────────────────
 
 class BillBase(BaseModel):
     consumer_unit: Optional[str] = None
@@ -25,7 +25,17 @@ class BillResponse(BillBase):
     model_config = {"from_attributes": True}
 
 
-# ── Supplier schemas ──────────────────────────────────────────────────────────
+class UploadBillResponse(BaseModel):
+    bill: BillResponse
+    message: str = "Bill parsed successfully"
+    kwh_extraction_method: Optional[str] = None
+    cost_extraction_method: Optional[str] = None
+    kwh_confidence: str = "high"  # high, low, not_found
+    cost_confidence: str = "high"  # high, low, not_found
+    extraction_notes: Optional[str] = None
+
+
+# ── Supplier schemas ────────────────────────────────────────────────────────
 
 class SupplierBase(BaseModel):
     name: str
@@ -58,6 +68,7 @@ class SupplierSimulationResult(BaseModel):
     monthly_cost: float
     monthly_savings: float
     yearly_savings: float
+    savings_percentage: float  # e.g., 18.5 for 18.5%
 
 
 class SimulationResponse(BaseModel):
@@ -65,18 +76,15 @@ class SimulationResponse(BaseModel):
     monthly_kwh: float
     best_option: SupplierSimulationResult
     all_options: list[SupplierSimulationResult]
+    savings_range: Optional[dict] = None  # {"min": 12, "max": 24} for percentage range
+    estimated_savings_min: float  # Minimum savings percentage
+    estimated_savings_max: float  # Maximum savings percentage
+    recommended_contract_type: str  # e.g., "Fixed-price renewable"
 
     model_config = {"from_attributes": True}
 
 
-# ── Parsed bill upload response ───────────────────────────────────────────────
-
-class UploadBillResponse(BaseModel):
-    bill: BillResponse
-    message: str = "Bill parsed successfully"
-
-
-# ── Partner schemas ───────────────────────────────────────────────────────────
+# ── Partner schemas ─────────────────────────────────────────────────────────
 
 class PartnerResponse(BaseModel):
     id: int
@@ -89,7 +97,7 @@ class PartnerResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ── Lead schemas ──────────────────────────────────────────────────────────────
+# ── Lead schemas ──────────────────────────────────────────────────────────
 
 class LeadCreate(BaseModel):
     name: str
