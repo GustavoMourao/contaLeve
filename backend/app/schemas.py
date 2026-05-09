@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import Optional
+from datetime import datetime
 
 
 class BillBase(BaseModel):
@@ -16,10 +17,16 @@ class BillCreate(BillBase):
 
 class BillResponse(BillBase):
     id: int
-    created_at: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_serializer('created_at')
+    def serialize_created_at(self, value):
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return value
 
 
 class UploadBillResponse(BaseModel):
@@ -47,10 +54,16 @@ class SupplierCreate(SupplierBase):
 class SupplierResponse(SupplierBase):
     id: int
     description: Optional[str] = None
-    created_at: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_serializer('created_at')
+    def serialize_created_at(self, value):
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return value
 
 
 class SupplierSimulationResult(BaseModel):
@@ -58,6 +71,7 @@ class SupplierSimulationResult(BaseModel):
     monthly_cost: float
     monthly_savings: float
     yearly_savings: float
+    savings_percentage: float
 
 
 class SimulationResponse(BaseModel):
@@ -65,6 +79,9 @@ class SimulationResponse(BaseModel):
     monthly_kwh: float
     best_option: Optional[SupplierSimulationResult]
     all_options: list[SupplierSimulationResult]
+    estimated_savings_min: float
+    estimated_savings_max: float
+    recommended_contract_type: str
 
 
 class SimulationRequest(BaseModel):
@@ -126,8 +143,14 @@ class LeadResponse(BaseModel):
     status: str
     notes: Optional[str] = None
     partner: Optional[PartnerResponse] = None
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_serializer('created_at', 'updated_at')
+    def serialize_timestamps(self, value):
+        if isinstance(value, datetime):
+            return value.isoformat()
+        return value
