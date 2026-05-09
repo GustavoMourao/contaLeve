@@ -38,8 +38,8 @@ def _extract_text_from_pdf(file_bytes: bytes) -> str:
             
             full_text = "\n".join(text_parts)
             logger.info(f"PDF extraction complete. Total text length: {len(full_text)}")
-            # Log first 500 chars for debugging
-            logger.debug(f"First 500 chars: {full_text[:500]}")
+            # Log first 1000 chars for debugging
+            logger.debug(f"Extracted text:\n{full_text[:1000]}")
             return full_text
     except Exception as exc:
         logger.warning(f"pdfplumber extraction failed: {exc}")
@@ -58,46 +58,94 @@ def _extract_text_from_image(file_bytes: bytes) -> str:
         return ""
 
 
-def _parse_kwh(text: str) -> tuple[Optional[float], str]:
+def _extract_all_numbers(text: str) -> dict:
+    """
+    Extract all potentially important numbers from bill.
+    Returns dict with all found values and their context.
+    """
+    results = {
+        "kwh_values": [],
+        "cost_values": [],
+        "other_numbers": [],
+    }
+    
+    if not text:
+        return results
+    
+    # Find all numbers followed by kWh
+    kwh_pattern = r"(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|KWH|kwh)"
+    for match in re.finditer(kwh_pattern, text, re.IGNORECASE):
+        value = match.group(1).replace(",", ".")
+        try:
+            results["kwh_values"].append({
+                "value": float(value),
+                "raw": match.group(0),
+                "context": text[max(0, match.start()-50):min(len(text), match.end()+50)]
+            })
+        except ValueError:
+            pass
+    
+    # Find all R$ amounts
+    reais_pattern = r"R\$\s*(\d{1,5}[.,]\d{2})"
+    for match in re.finditer(reais_pattern, text):
+        value = match.group(1).replace(".", "").replace(",", ".")
+        try:
+            results["cost_values"].append({
+                "value": float(value),
+                "raw": match.group(0),
+                "context": text[max(0, match.start()-50):min(len(text), match.end()+50)]
+            })
+        except ValueError:
+            pass
+    
+    # Find all 3-5 digit numbers as potential consumption/values
+    all_numbers = re.finditer(r"\b(\d{2,6})\b", text)
+    for match in all_numbers:
+        num = int(match.group(1))
+        if 50 < num < 9999:  # Reasonable consumption range
+            context = text[max(0, match.start()-50):min(len(text), match.end()+50)]
+            # Don't duplicate if already found in other categories
+            if not any(str(num) in str(kv["value"]) for kv in results["kwh_values"]):
+                results["other_numbers"].append({
+                    "value": num,
+                    "context": context
+                })
+    
+    logger.info(f"Found {len(results['kwh_values'])} kWh values, {len(results['cost_values'])} cost values")
+    return results
+
+
+def _parse_kwh(text: str) -> tuple[Optional[float], str, str]:
     """
     Find consumption in kWh inside extracted text.
-    Handles Celesc and other Brazilian utility formats.
     
-    Returns: (value, extraction_method)
+    Returns: (value, extraction_method, confidence_reason)
     """
     if not text:
-        return None, "empty_text"
+        return None, "empty_text", "Text is empty"
     
-    # Debug: log what we're searching in
-    logger.debug(f"Searching for kWh in text of length: {len(text)}")
-    
-    # Priority 1: "Total Apurado" with immediate numeric value (table format)
+    # Priority 1: "Total Apurado" or "Apurado"
     patterns_apurado = [
-        # Direct: "Total Apurado 138" or with pipes "|Total Apurado|138|"
-        r"Total\s+Apurado[|\s]+(\d{2,4})",
-        r"apurado[|\s]+(\d{2,4})(?:\s|$|\n|\|)",
-        # Colon format
-        r"Total\s+Apurado[:\s]+(\d{2,4})",
-        # With spacing variations
-        r"(?:Total|TOTAL)\s+(?:Apurado|APURADO)\s+(\d{2,4})\s*(?:kWh)?",
+        r"Total\s+Apurado[:\s|]+(\d{2,4})",
+        r"(?:Total|TOTAL)\s+(?:Apurado|APURADO)[:\s|]*(\d{2,4})",
+        r"Apurado[:\s|]+(\d{2,4})",
     ]
     
-    for i, pattern in enumerate(patterns_apurado):
-        logger.debug(f"Trying pattern {i}: {pattern}")
-        match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
+    for pattern in patterns_apurado:
+        match = re.search(pattern, text, re.IGNORECASE)
         if match:
             try:
                 value = float(match.group(1))
-                logger.info(f"✓ Found kWh via pattern {i}: {value}")
                 if 0 < value < 10000:
-                    return value, "total_apurado"
-            except (ValueError, AttributeError) as e:
-                logger.debug(f"Pattern {i} matched but failed to convert: {e}")
+                    logger.info(f"✓ Found kWh via 'Apurado' pattern: {value}")
+                    return value, "total_apurado", f"Found in 'Total Apurado' field"
+            except ValueError:
+                pass
 
     # Priority 2: Look for "Consumo" or "Energia" labels
     patterns_consumo = [
-        r"Consumo[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh)?",
-        r"Energia\s+El[eé]trica[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh)?",
+        r"(?:Consumo|CONSUMO)[:\s]+(\d{1,5}[.,]?\d{0,3})",
+        r"(?:Energia|ENERGIA)\s+El[eé]trica[:\s]+(\d{1,5}[.,]?\d{0,3})",
     ]
     for pattern in patterns_consumo:
         match = re.search(pattern, text, re.IGNORECASE)
@@ -106,8 +154,8 @@ def _parse_kwh(text: str) -> tuple[Optional[float], str]:
                 raw = match.group(1).replace(",", ".")
                 value = float(raw)
                 if 0 < value < 10000:
-                    return value, "consumo"
-            except (ValueError, AttributeError):
+                    return value, "consumo", "Found in 'Consumo' field"
+            except ValueError:
                 pass
 
     # Priority 3: Generic kWh pattern
@@ -118,61 +166,53 @@ def _parse_kwh(text: str) -> tuple[Optional[float], str]:
             raw = match.group(1).replace(",", ".")
             value = float(raw)
             if 0 < value < 10000:
-                return value, "generic_kwh"
+                return value, "generic_kwh", "Found as generic kWh value"
         except ValueError:
             pass
 
     logger.warning("No kWh pattern matched")
-    return None, "not_found"
+    return None, "not_found", "Could not extract consumption value from bill"
 
 
-def _parse_total_cost(text: str) -> tuple[Optional[float], str]:
+def _parse_total_cost(text: str) -> tuple[Optional[float], str, str]:
     """
     Find total cost (R$) inside extracted text.
-    Handles various Brazilian utility bill formats.
     
-    Returns: (value, extraction_method)
+    Returns: (value, extraction_method, confidence_reason)
     """
     if not text:
-        return None, "empty_text"
+        return None, "empty_text", "Text is empty"
     
     patterns = [
-        # Standard patterns
-        (r"TOTAL\s+A\s+PAGAR[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "total_pagar"),
-        (r"Total\s+a\s+Pagar[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "total_pagar"),
-        (r"VALOR\s+TOTAL[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "valor_total"),
-        (r"Custo\s+Atual[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "custo_atual"),
-        
-        # Celesc specific (bottom of bill) - look for TOTAL line
-        (r"(?:^|\n)\s*TOTAL\s+(\d{1,5}[.,]\d{2})", "celesc_total"),
-        (r"TOTAL\s+(\d{1,5}[.,]\d{2})(?:\s|$|LEGENDA)", "total_bottom"),
-        
-        # Fallback: any R$ amount
-        (r"R\$\s*(\d{1,5}[.,]\d{2})", "generic_reais"),
+        (r"(?:TOTAL|Total)\s+A\s+PAGAR[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "total_pagar", "Found in 'Total a Pagar' field"),
+        (r"(?:VALOR|Valor)\s+TOTAL[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "valor_total", "Found in 'Valor Total' field"),
+        (r"(?:Custo|CUSTO)\s+(?:Atual|ATUAL)[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "custo_atual", "Found in 'Custo Atual' field"),
+        (r"(?:^|\n)\s*(?:TOTAL|Total)\s+(\d{1,5}[.,]\d{2})(?:\s|$)", "celesc_total", "Found in bottom 'TOTAL' field"),
+        (r"R\$\s*(\d{1,5}[.,]\d{2})", "generic_reais", "Found as generic R$ amount"),
     ]
     
-    for pattern, method in patterns:
+    for pattern, method, reason in patterns:
         match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
         if match:
             try:
                 raw = match.group(1).replace(".", "").replace(",", ".")
                 value = float(raw)
-                if 0 < value < 100000:  # Reasonable range
+                if 0 < value < 100000:
                     logger.info(f"✓ Found cost via {method}: {value}")
-                    return value, method
-            except (ValueError, AttributeError) as e:
-                logger.debug(f"Pattern {method} matched but failed to convert: {e}")
+                    return value, method, reason
+            except ValueError:
+                pass
     
     logger.warning("No cost pattern matched")
-    return None, "not_found"
+    return None, "not_found", "Could not extract total cost from bill"
 
 
 def _parse_consumer_unit(text: str) -> Optional[str]:
     """Extract consumer unit/UC from bill."""
     patterns = [
-        r"(?:UNIDADE\s+)?CONSUMIDORA[:\s]+(\d{5,12})",
+        r"(?:UNIDADE|Unidade)\s+(?:CONSUMIDORA|Consumidora)[:\s]+(\d{5,12})",
         r"UC[:\s]+(\d{5,12})",
-        r"N[ÚU]MERO\s+DE\s+INSTALA[CÇ][AÃ]O[:\s]+(\d{5,12})",
+        r"(?:N[ÚU]MERO|Número)\s+DE\s+(?:INSTALA[CÇ][AÃ]O|Instalação)[:\s]+(\d{5,12})",
     ]
     for pattern in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
@@ -196,8 +236,8 @@ def _parse_utility(text: str) -> Optional[str]:
 def _parse_tariff(text: str) -> Optional[float]:
     """Extract tariff/price per kWh."""
     patterns = [
-        r"TARIFA[:\s]+R?\$?\s*(\d+[.,]\d+)",
-        r"PRE[CÇ]O[:\s]+R?\$?\s*(\d+[.,]\d+)",
+        r"(?:TARIFA|Tarifa)[:\s]+R?\$?\s*(\d+[.,]\d+)",
+        r"(?:PRE[CÇ]O|Preço)[:\s]+R?\$?\s*(\d+[.,]\d+)",
     ]
     for pattern in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
@@ -213,10 +253,9 @@ def _parse_tariff(text: str) -> Optional[float]:
 def parse_bill(file_bytes: bytes, filename: str) -> dict:
     """
     Parse an electricity bill file (PDF or image).
-
-    Returns a dict with:
-        consumer_unit, monthly_kwh, tariff, total_cost, utility, raw_text,
-        kwh_extraction_method, cost_extraction_method, confidence levels
+    
+    Now returns partial data instead of failing completely.
+    If consumption or cost can't be extracted, returns None with reason.
     """
     filename_lower = filename.lower()
     
@@ -225,36 +264,25 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
     if filename_lower.endswith(".pdf"):
         text = _extract_text_from_pdf(file_bytes)
         if not text.strip():
-            # Try OCR fallback
             logger.info("PDF text extraction was empty, trying OCR fallback...")
             text = _extract_text_via_pymupdf_ocr(file_bytes)
     else:
         text = _extract_text_from_image(file_bytes)
 
-    # Debug: log extracted text length and sample
     logger.info(f"Total extracted text: {len(text)} characters")
     if text:
         logger.debug(f"Text sample:\n{text[:1000]}")
 
-    monthly_kwh, kwh_method = _parse_kwh(text)
-    total_cost, cost_method = _parse_total_cost(text)
+    monthly_kwh, kwh_method, kwh_reason = _parse_kwh(text)
+    total_cost, cost_method, cost_reason = _parse_total_cost(text)
     consumer_unit = _parse_consumer_unit(text)
     utility = _parse_utility(text)
     tariff = _parse_tariff(text)
+    
+    # Extract all numbers for fallback/context
+    all_numbers = _extract_all_numbers(text)
 
-    # Track extraction quality
-    kwh_confidence = "high" if kwh_method in ["total_apurado", "consumo"] else "low"
-    cost_confidence = "high" if cost_method in ["total_pagar", "custo_atual", "celesc_total"] else "low"
-
-    logger.info(f"Extraction results: kWh={monthly_kwh} ({kwh_method}), Cost={total_cost} ({cost_method})")
-
-    if monthly_kwh is None:
-        logger.warning(f"Could not parse kWh from bill (method: {kwh_method})")
-        kwh_confidence = "not_found"
-
-    if total_cost is None:
-        logger.warning(f"Could not parse total cost from bill (method: {cost_method})")
-        cost_confidence = "not_found"
+    logger.info(f"Extraction: kWh={monthly_kwh} ({kwh_reason}), Cost={total_cost} ({cost_reason})")
 
     return {
         "consumer_unit": consumer_unit,
@@ -265,8 +293,10 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
         "raw_text": text[:2000] if text else None,
         "kwh_extraction_method": kwh_method,
         "cost_extraction_method": cost_method,
-        "kwh_confidence": kwh_confidence,
-        "cost_confidence": cost_confidence,
+        "kwh_reason": kwh_reason,
+        "cost_reason": cost_reason,
+        "all_extracted_values": all_numbers,  # For debugging/fallback
+        "extraction_success": monthly_kwh is not None and total_cost is not None,
     }
 
 
