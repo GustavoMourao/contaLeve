@@ -35,40 +35,78 @@ def _extract_text_from_image(file_bytes: bytes) -> str:
         return ""
 
 
-def _parse_kwh(text: str) -> Optional[float]:
-    """Find consumption in kWh inside extracted text."""
-    patterns = [
-        r"(\d{1,5}[.,]?\d{0,3})\s*kWh",
-        r"consumo[:\s]+(\d{1,5}[.,]?\d{0,3})",
-        r"energia\s+el[eé]trica[:\s]+(\d{1,5}[.,]?\d{0,3})",
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            raw = match.group(1).replace(",", ".")
-            try:
-                return float(raw)
-            except ValueError:
-                continue
-    return None
+def _parse_kwh(text: str) -> tuple[Optional[float], str]:
+    """
+    Find consumption in kWh inside extracted text.
+    
+    Returns: (value, extraction_method)
+      extraction_method: "total_apurado", "consumo", "energia_eletrica", or "fallback"
+    """
+    # Priority 1: "Total apurado" - the most important line on Brazilian bills
+    pattern_total_apurado = r"total\s+apurado[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
+    match = re.search(pattern_total_apurado, text, re.IGNORECASE)
+    if match:
+        raw = match.group(1).replace(",", ".")
+        try:
+            return float(raw), "total_apurado"
+        except ValueError:
+            pass
+
+    # Priority 2: "Consumo" keyword
+    pattern_consumo = r"consumo[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
+    match = re.search(pattern_consumo, text, re.IGNORECASE)
+    if match:
+        raw = match.group(1).replace(",", ".")
+        try:
+            return float(raw), "consumo"
+        except ValueError:
+            pass
+
+    # Priority 3: "Energia elétrica" keyword
+    pattern_energia = r"energia\s+el[eé]trica[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
+    match = re.search(pattern_energia, text, re.IGNORECASE)
+    if match:
+        raw = match.group(1).replace(",", ".")
+        try:
+            return float(raw), "energia_eletrica"
+        except ValueError:
+            pass
+
+    # Fallback: any kWh pattern
+    pattern_generic = r"(\d{1,5}[.,]?\d{0,3})\s*kWh"
+    match = re.search(pattern_generic, text, re.IGNORECASE)
+    if match:
+        raw = match.group(1).replace(",", ".")
+        try:
+            return float(raw), "generic_kwh"
+        except ValueError:
+            pass
+
+    return None, "not_found"
 
 
-def _parse_total_cost(text: str) -> Optional[float]:
-    """Find total cost (R$) inside extracted text."""
+def _parse_total_cost(text: str) -> tuple[Optional[float], str]:
+    """
+    Find total cost (R$) inside extracted text.
+    
+    Returns: (value, extraction_method)
+    """
     patterns = [
-        r"total\s+a\s+pagar[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})",
-        r"valor\s+total[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})",
-        r"R\$\s*(\d{1,5}[.,]\d{2})",
+        (r"total\s+a\s+pagar[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "total_pagar"),
+        (r"valor\s+total[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "valor_total"),
+        (r"custo\s+atual[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "custo_atual"),
     ]
-    for pattern in patterns:
+    
+    for pattern, method in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
             raw = match.group(1).replace(".", "").replace(",", ".")
             try:
-                return float(raw)
+                return float(raw), method
             except ValueError:
                 continue
-    return None
+    
+    return None, "not_found"
 
 
 def _parse_consumer_unit(text: str) -> Optional[str]:
@@ -116,7 +154,8 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
     Parse an electricity bill file (PDF or image).
 
     Returns a dict with:
-        consumer_unit, monthly_kwh, tariff, total_cost, utility, raw_text
+        consumer_unit, monthly_kwh, tariff, total_cost, utility, raw_text,
+        kwh_extraction_method, cost_extraction_method
     """
     filename_lower = filename.lower()
 
@@ -128,21 +167,25 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
     else:
         text = _extract_text_from_image(file_bytes)
 
-    monthly_kwh = _parse_kwh(text)
-    total_cost = _parse_total_cost(text)
+    monthly_kwh, kwh_method = _parse_kwh(text)
+    total_cost, cost_method = _parse_total_cost(text)
     consumer_unit = _parse_consumer_unit(text)
     utility = _parse_utility(text)
     tariff = _parse_tariff(text)
 
-    # If we could not find critical fields use safe defaults so the MVP
-    # can still demonstrate the flow with sample data.
+    # Track extraction quality
+    kwh_confidence = "high" if kwh_method in ["total_apurado", "consumo"] else "low"
+    cost_confidence = "high" if cost_method in ["total_pagar", "custo_atual"] else "low"
+
     if monthly_kwh is None:
-        logger.info("Could not parse kWh from bill – using demo value 320")
-        monthly_kwh = 320.0
+        logger.warning("Could not parse kWh from bill – could not extract consumption")
+        monthly_kwh = None
+        kwh_confidence = "not_found"
 
     if total_cost is None:
-        logger.info("Could not parse total cost – using demo value 272.00")
-        total_cost = 272.00
+        logger.warning("Could not parse total cost from bill")
+        total_cost = None
+        cost_confidence = "not_found"
 
     return {
         "consumer_unit": consumer_unit,
@@ -151,6 +194,10 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
         "total_cost": total_cost,
         "utility": utility,
         "raw_text": text[:2000] if text else None,
+        "kwh_extraction_method": kwh_method,
+        "cost_extraction_method": cost_method,
+        "kwh_confidence": kwh_confidence,
+        "cost_confidence": cost_confidence,
     }
 
 
