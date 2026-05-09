@@ -32,6 +32,7 @@ export interface SupplierSimulationResult {
   monthly_cost: number;
   monthly_savings: number;
   yearly_savings: number;
+  savings_percentage: number;
 }
 
 export interface SimulationResponse {
@@ -39,11 +40,19 @@ export interface SimulationResponse {
   monthly_kwh: number;
   best_option: SupplierSimulationResult;
   all_options: SupplierSimulationResult[];
+  estimated_savings_min: number;
+  estimated_savings_max: number;
+  recommended_contract_type: string;
 }
 
 export interface UploadBillResponse {
   bill: Bill;
   message: string;
+  kwh_extraction_method?: string;
+  cost_extraction_method?: string;
+  kwh_confidence?: string;
+  cost_confidence?: string;
+  extraction_notes?: string;
 }
 
 export type VoltageLevel = "low" | "medium" | "high";
