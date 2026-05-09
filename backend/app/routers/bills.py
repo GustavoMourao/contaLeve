@@ -41,19 +41,29 @@ async def upload_bill(
     monthly_kwh = parsed.get("monthly_kwh")
     total_cost = parsed.get("total_cost")
     
+    # Get extraction methods and reasons
+    kwh_method = parsed.get("kwh_extraction_method", "not_found")
+    cost_method = parsed.get("cost_extraction_method", "not_found")
+    kwh_reason = parsed.get("kwh_reason", "Could not extract kWh")
+    cost_reason = parsed.get("cost_reason", "Could not extract cost")
+    
     # Use defaults if parsing failed, with notes about what wasn't extracted
     extraction_notes = []
+    extraction_success = True
+    
     if monthly_kwh is None:
-        extraction_notes.append(f"❌ Consumo: {parsed.get('kwh_reason', 'Não foi possível extrair')}")
+        extraction_notes.append(f"❌ Consumo: {kwh_reason}")
         monthly_kwh = 0.0
+        extraction_success = False
     else:
-        extraction_notes.append(f"✓ Consumo: {monthly_kwh} kWh - {parsed.get('kwh_reason')}")
+        extraction_notes.append(f"✓ Consumo: {monthly_kwh} kWh ({kwh_method})")
     
     if total_cost is None:
-        extraction_notes.append(f"❌ Custo: {parsed.get('cost_reason', 'Não foi possível extrair')}")
+        extraction_notes.append(f"❌ Custo: {cost_reason}")
         total_cost = 0.0
+        extraction_success = False
     else:
-        extraction_notes.append(f"✓ Custo: R$ {total_cost:.2f} - {parsed.get('cost_reason')}")
+        extraction_notes.append(f"✓ Custo: R$ {total_cost:.2f} ({cost_method})")
 
     # Create bill record even with partial data
     db_bill = Bill(
@@ -69,11 +79,11 @@ async def upload_bill(
     db.refresh(db_bill)
 
     # Prepare response message
-    if parsed.get("extraction_success"):
+    if extraction_success:
         message = "Conta processada com sucesso!"
         status = "success"
     else:
-        message = "Conta processada, mas alguns dados não foram extraídos. Contate-nos para verificação manual."
+        message = "Conta processada, mas alguns dados não foram extraídos. Por favor, verifique os valores."
         status = "partial"
 
     return UploadBillResponse(
@@ -81,8 +91,8 @@ async def upload_bill(
         message=message,
         status=status,
         extraction_notes="\n".join(extraction_notes),
-        kwh_extraction_method=parsed.get("kwh_extraction_method"),
-        cost_extraction_method=parsed.get("cost_extraction_method"),
-        kwh_confidence=parsed.get("kwh_extraction_method") if monthly_kwh > 0 else "not_found",
-        cost_confidence=parsed.get("cost_extraction_method") if total_cost > 0 else "not_found",
+        kwh_extraction_method=kwh_method,
+        cost_extraction_method=cost_method,
+        kwh_confidence="high" if monthly_kwh > 0 else "not_found",
+        cost_confidence="high" if total_cost > 0 else "not_found",
     )
