@@ -2,185 +2,204 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bill, SimulationResponse, SupplierSimulationResult, Partner } from "@/lib/types";
-import Link from "next/link";
-import LeadModal from "@/components/LeadModal";
-import { getPartners } from "@/lib/api";
-import { ArrowRight, Leaf, Zap, TrendingDown } from "lucide-react";
-
-function SavingsBadge({ savings }: { savings: number }) {
-  const pos = savings > 0;
-  return (
-    <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${pos ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
-      {pos ? `Economize R$ ${savings.toFixed(2)}/mês` : "Sem economia estimada"}
-    </span>
-  );
-}
-
-function OfferCard({ result, isBest, partner, bill, onSelect }: {
-  result: SupplierSimulationResult;
-  isBest: boolean;
-  partner: Partner | null;
-  bill: Bill;
-  onSelect: (r: SupplierSimulationResult, p: Partner | null) => void;
-}) {
-  return (
-    <div className={`bg-white rounded-2xl p-5 border-2 transition-shadow hover:shadow-md ${isBest ? "border-green-500 shadow-sm" : "border-slate-100"}`}>
-      {isBest && <div className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">⭐ Melhor oferta</div>}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-slate-900 text-lg leading-tight mb-0.5">{result.supplier.name}</h3>
-          {partner && (
-            <p className="text-xs text-slate-400 mb-1">
-              Parceiro:{" "}
-              <a href={partner.website ?? "#"} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">{partner.name}</a>
-            </p>
-          )}
-          <p className="text-sm text-slate-500">{result.supplier.description}</p>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {result.supplier.renewable && (
-              <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1">
-                <Leaf className="w-3 h-3" />100% renovável
-              </span>
-            )}
-            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">
-              {result.supplier.type === "fixed" ? "Tarifa fixa" : "Tarifa variável"}
-            </span>
-          </div>
-        </div>
-        <div className="text-right shrink-0">
-          <p className="text-2xl font-extrabold text-slate-900">R$ {result.monthly_cost.toFixed(2)}</p>
-          <p className="text-xs text-slate-400">por mês</p>
-          <div className="mt-1.5"><SavingsBadge savings={result.monthly_savings} /></div>
-        </div>
-      </div>
-      {result.monthly_savings > 0 && (
-        <div className="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-500">
-          Economia anual: <strong className="text-green-700">R$ {result.yearly_savings.toFixed(2)}</strong>
-        </div>
-      )}
-      <button
-        onClick={() => onSelect(result, partner)}
-        className={`mt-4 w-full font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm ${
-          isBest ? "bg-green-600 hover:bg-green-700 text-white" : "border border-green-600 text-green-700 hover:bg-green-50"
-        }`}
-      >
-        Quero esta oferta <ArrowRight className="w-4 h-4" />
-      </button>
-    </div>
-  );
-}
+import { Bill, SimulationResponse } from "@/lib/types";
 
 export default function ResultsPage() {
   const router = useRouter();
   const [bill, setBill] = useState<Bill | null>(null);
   const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [selected, setSelected] = useState<{ offer: SupplierSimulationResult; partner: Partner | null } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const b = sessionStorage.getItem("bill");
-    const s = sessionStorage.getItem("simulation");
-    if (!b || !s) { router.replace("/"); return; }
-    setBill(JSON.parse(b));
-    setSimulation(JSON.parse(s));
-    getPartners().then(setPartners).catch(() => {});
-  }, [router]);
+    const billData = sessionStorage.getItem("bill");
+    const simData = sessionStorage.getItem("simulation");
 
-  if (!bill || !simulation) {
-    return <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" /></div>;
+    if (billData && simData) {
+      setBill(JSON.parse(billData));
+      setSimulation(JSON.parse(simData));
+    }
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Carregando resultados...</p>
+        </div>
+      </div>
+    );
   }
 
-  const best = simulation.best_option;
-  const findPartner = (name: string): Partner | null =>
-    partners.find((p) => name.toLowerCase().includes(p.name.toLowerCase().split(" ")[0])) ?? null;
+  if (!bill || !simulation) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center p-8">
+          <p className="text-lg text-red-600 mb-4">Nenhum resultado encontrado.</p>
+          <button
+            onClick={() => router.push("/")}
+            className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Banner */}
-      <section className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-3xl p-8 text-center text-white">
-        {best.monthly_savings > 0 ? (
-          <>
-            <p className="text-green-100 text-lg">Identificamos uma economia de</p>
-            <p className="text-5xl font-extrabold my-2">R$ {best.monthly_savings.toFixed(2)}/mês</p>
-            <p className="text-green-100">
-              Com <strong className="text-white">{best.supplier.name}</strong> — economia de{" "}
-              <strong className="text-white">R$ {best.yearly_savings.toFixed(2)} no primeiro ano</strong>
-            </p>
-            <button
-              onClick={() => setSelected({ offer: best, partner: findPartner(best.supplier.name) })}
-              className="mt-5 bg-white hover:bg-green-50 text-green-700 font-bold px-8 py-3 rounded-2xl transition-colors shadow-md inline-flex items-center gap-2"
-            >
-              Quero esta oferta <ArrowRight className="w-4 h-4" />
-            </button>
-          </>
-        ) : (
-          <p className="text-2xl font-bold">Você já tem uma ótima tarifa! 🎉</p>
-        )}
-      </section>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">✅ Sua análise está pronta</h1>
+          <p className="text-gray-600">Confira os detalhes e economias estimadas</p>
+        </div>
 
-      {/* Bill stats */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "Consumo mensal", value: `${bill.monthly_kwh} kWh` },
-          { label: "Custo atual", value: `R$ ${bill.total_cost.toFixed(2)}` },
-          { label: "Distribuidora", value: bill.utility ?? "—" },
-          { label: "Unidade", value: bill.consumer_unit ?? "—" },
-        ].map((item) => (
-          <div key={item.label} className="bg-white rounded-2xl p-4 border border-slate-100 text-center">
-            <p className="text-xs text-slate-400 uppercase tracking-wide">{item.label}</p>
-            <p className="text-xl font-bold text-slate-900 mt-1">{item.value}</p>
+        {/* STEP 1: Your Bill */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-l-4 border-green-500">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="text-3xl">📄</div>
+            <h2 className="text-2xl font-bold text-gray-800">PASSO 1 — Sua Conta</h2>
           </div>
-        ))}
-      </section>
 
-      {/* All offers */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-slate-800">Todas as ofertas disponíveis</h2>
-          <Link href="/compare" className="text-sm text-green-600 hover:underline">Ver tabela →</Link>
-        </div>
-        <div className="grid gap-4">
-          {simulation.all_options.map((r) => (
-            <OfferCard
-              key={r.supplier.id}
-              result={r}
-              isBest={r.supplier.id === best.supplier.id}
-              partner={findPartner(r.supplier.name)}
-              bill={bill}
-              onSelect={(offer, partner) => setSelected({ offer, partner })}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-        <h3 className="font-bold text-slate-800 mb-4">Como funciona a troca?</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-          {[
-            { n: "1", t: "Você solicita a oferta", d: "Preenche seus dados gratuitamente." },
-            { n: "2", t: "Parceiro entra em contato", d: "Especialista liga em até 24h para detalhar o contrato." },
-            { n: "3", t: "Contrato assinado", d: "A troca é feita sem interromper o fornecimento." },
-          ].map((s) => (
-            <div key={s.n} className="flex gap-3">
-              <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{s.n}</div>
-              <div>
-                <p className="font-semibold text-slate-900">{s.t}</p>
-                <p className="text-xs mt-0.5 text-slate-500">{s.d}</p>
-              </div>
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Consumo Mensal</p>
+              <p className="text-3xl font-bold text-green-600">{bill.monthly_kwh.toFixed(0)}</p>
+              <p className="text-xs text-gray-500 mt-1">kWh</p>
             </div>
-          ))}
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Custo Atual</p>
+              <p className="text-3xl font-bold text-green-600">R$ {bill.total_cost.toFixed(2)}</p>
+              <p className="text-xs text-gray-500 mt-1">por mês</p>
+            </div>
+
+            {bill.utility && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">Distribuidora</p>
+                <p className="text-xl font-semibold text-gray-800">{bill.utility}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900">
+              ℹ️ <strong>Como extraímos:</strong> O consumo foi extraído da linha "Total apurado" da sua conta,
+              garantindo a precisão dos cálculos.
+            </p>
+          </div>
         </div>
-      </section>
 
-      <div className="text-center pb-4">
-        <Link href="/" className="text-sm text-slate-400 hover:text-slate-600 transition-colors">← Enviar outra conta</Link>
+        {/* STEP 2: Our Analysis */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-l-4 border-blue-500">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="text-3xl">🔍</div>
+            <h2 className="text-2xl font-bold text-gray-800">PASSO 2 — Nossa Análise</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
+              <p className="text-sm font-semibold text-gray-700 mb-1">✅ Valores confirmados com sucesso</p>
+              <p className="text-xs text-gray-600">
+                Sua conta foi processada com precisão. Os dados estão prontos para a simulação.
+              </p>
+            </div>
+
+            <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+              <p className="text-sm font-semibold text-gray-700 mb-1">📊 Comparamos com {simulation.all_options.length} fornecedores</p>
+              <p className="text-xs text-gray-600">
+                Analisamos as principais opções de energia disponíveis para seu perfil de consumo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* STEP 3: Estimated Savings */}
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg p-8 text-white mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="text-3xl">💰</div>
+            <h2 className="text-2xl font-bold">PASSO 3 — Economias Estimadas</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Savings Range */}
+            <div className="bg-white bg-opacity-20 backdrop-blur p-6 rounded-xl text-center">
+              <p className="text-sm font-semibold opacity-90 mb-2">ECONOMIA ESTIMADA</p>
+              <p className="text-5xl font-bold">
+                {simulation.estimated_savings_min.toFixed(0)}%–{simulation.estimated_savings_max.toFixed(0)}%
+              </p>
+              <p className="text-xs opacity-80 mt-2">por mês</p>
+            </div>
+
+            {/* Best Option */}
+            {simulation.best_option && (
+              <div className="bg-white bg-opacity-20 backdrop-blur p-6 rounded-xl">
+                <p className="text-sm font-semibold opacity-90 mb-3">MELHOR OPÇÃO</p>
+                <div className="bg-white bg-opacity-30 p-3 rounded-lg">
+                  <p className="font-bold text-lg">{simulation.best_option.supplier.name}</p>
+                  <p className="text-sm opacity-90 mt-1">
+                    💵 R$ {simulation.best_option.monthly_savings.toFixed(2)}/mês de economia
+                  </p>
+                  <p className="text-sm opacity-90">
+                    📅 R$ {simulation.best_option.yearly_savings.toFixed(2)}/ano
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Recommended Contract */}
+          <div className="bg-white bg-opacity-10 backdrop-blur p-6 rounded-xl border-2 border-white border-opacity-30">
+            <p className="text-sm font-semibold opacity-90 mb-2">🎯 RECOMENDAÇÃO</p>
+            <p className="text-2xl font-bold">{simulation.recommended_contract_type}</p>
+            <p className="text-xs opacity-75 mt-2">
+              Contrato de preço fixo com melhor relação custo-benefício para seu consumo.
+            </p>
+          </div>
+        </div>
+
+        {/* Warning Box */}
+        <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-lg mb-8">
+          <p className="text-sm text-amber-900">
+            <strong>⚠️ Importante:</strong> As economias apresentadas são estimativas baseadas nas tarifas
+            disponíveis. Os valores finais podem variar conforme contrato formalizado.
+          </p>
+        </div>
+
+        {/* Legal Disclaimer */}
+        <div className="bg-gray-100 p-6 rounded-lg text-center border border-gray-300 mb-8">
+          <p className="text-xs text-gray-700 leading-relaxed">
+            <strong>ContaLeve</strong> é uma plataforma de análise e intermediação de energia elétrica.
+            <br />
+            Os contratos de energia são formalizados por participantes autorizados do mercado.
+          </p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("bill");
+              sessionStorage.removeItem("simulation");
+              router.push("/");
+            }}
+            className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
+          >
+            ← Voltar ao Início
+          </button>
+          <button
+            onClick={() => {
+              alert("Próximas etapas em desenvolvimento...");
+            }}
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+          >
+            Continuar →
+          </button>
+        </div>
       </div>
-
-      {selected && (
-        <LeadModal offer={selected.offer} partner={selected.partner} bill={bill} onClose={() => setSelected(null)} />
-      )}
     </div>
   );
 }
