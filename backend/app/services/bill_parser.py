@@ -38,11 +38,12 @@ def _extract_text_from_image(file_bytes: bytes) -> str:
 def _parse_kwh(text: str) -> tuple[Optional[float], str]:
     """
     Find consumption in kWh inside extracted text.
+    Celesc/other bills format: looks for patterns in tables and text.
     
     Returns: (value, extraction_method)
-      extraction_method: "total_apurado", "consumo", "energia_eletrica", or "fallback"
+      extraction_method: "total_apurado", "table_row", "generic_kwh", or "not_found"
     """
-    # Priority 1: "Total apurado" - the most important line on Brazilian bills
+    # Priority 1: "Total Apurado" - exact match (from other bills)
     pattern_total_apurado = r"total\s+apurado[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
     match = re.search(pattern_total_apurado, text, re.IGNORECASE)
     if match:
@@ -52,8 +53,18 @@ def _parse_kwh(text: str) -> tuple[Optional[float], str]:
         except ValueError:
             pass
 
-    # Priority 2: "Consumo" keyword
-    pattern_consumo = r"consumo[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
+    # Priority 2: Table row with "Total Apurado" label (Celesc format)
+    # Pattern: looks for row with "Total Apurado" in leftmost column, then captures number
+    pattern_celesc_table = r"Total\s+Apurado\s+(\d{1,5})\s*(?:\||$|\n)"
+    match = re.search(pattern_celesc_table, text, re.IGNORECASE)
+    if match:
+        try:
+            return float(match.group(1)), "table_row"
+        except ValueError:
+            pass
+
+    # Priority 3: Look for patterns like "13.837" or similar in consumption context
+    pattern_consumo = r"(?:consumo|energia)[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
     match = re.search(pattern_consumo, text, re.IGNORECASE)
     if match:
         raw = match.group(1).replace(",", ".")
@@ -62,17 +73,7 @@ def _parse_kwh(text: str) -> tuple[Optional[float], str]:
         except ValueError:
             pass
 
-    # Priority 3: "Energia elétrica" keyword
-    pattern_energia = r"energia\s+el[eé]trica[:\s]+(\d{1,5}[.,]?\d{0,3})\s*(?:kWh|kwh)"
-    match = re.search(pattern_energia, text, re.IGNORECASE)
-    if match:
-        raw = match.group(1).replace(",", ".")
-        try:
-            return float(raw), "energia_eletrica"
-        except ValueError:
-            pass
-
-    # Fallback: any kWh pattern
+    # Priority 4: Generic kWh pattern
     pattern_generic = r"(\d{1,5}[.,]?\d{0,3})\s*kWh"
     match = re.search(pattern_generic, text, re.IGNORECASE)
     if match:
@@ -95,6 +96,7 @@ def _parse_total_cost(text: str) -> tuple[Optional[float], str]:
         (r"total\s+a\s+pagar[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "total_pagar"),
         (r"valor\s+total[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "valor_total"),
         (r"custo\s+atual[:\s]+R?\$?\s*(\d{1,5}[.,]\d{2})", "custo_atual"),
+        (r"TOTAL\s+(\d{1,5}[.,]\d{2})(?:\s|$|LEGENDA)", "celesc_total"),  # Celesc format
     ]
     
     for pattern, method in patterns:
@@ -174,17 +176,15 @@ def parse_bill(file_bytes: bytes, filename: str) -> dict:
     tariff = _parse_tariff(text)
 
     # Track extraction quality
-    kwh_confidence = "high" if kwh_method in ["total_apurado", "consumo"] else "low"
-    cost_confidence = "high" if cost_method in ["total_pagar", "custo_atual"] else "low"
+    kwh_confidence = "high" if kwh_method in ["total_apurado", "consumo", "table_row"] else "low"
+    cost_confidence = "high" if cost_method in ["total_pagar", "custo_atual", "celesc_total"] else "low"
 
     if monthly_kwh is None:
         logger.warning("Could not parse kWh from bill – could not extract consumption")
-        monthly_kwh = None
         kwh_confidence = "not_found"
 
     if total_cost is None:
         logger.warning("Could not parse total cost from bill")
-        total_cost = None
         cost_confidence = "not_found"
 
     return {
