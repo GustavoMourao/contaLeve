@@ -1,15 +1,12 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
-
-# ── Bill schemas ──────────────────────────────────────────────────────────
 
 class BillBase(BaseModel):
-    consumer_unit: Optional[str] = None
     monthly_kwh: float
     tariff: Optional[float] = None
     total_cost: float
+    consumer_unit: Optional[str] = None
     utility: Optional[str] = None
 
 
@@ -19,10 +16,10 @@ class BillCreate(BillBase):
 
 class BillResponse(BillBase):
     id: int
-    user_id: Optional[int] = None
-    created_at: datetime
+    created_at: str
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
 
 
 class UploadBillResponse(BaseModel):
@@ -36,14 +33,11 @@ class UploadBillResponse(BaseModel):
     cost_confidence: str = "high"
 
 
-# ── Supplier schemas ────────────────────────────────────────────────────────
-
 class SupplierBase(BaseModel):
     name: str
     price_per_kwh: float
     type: str = "fixed"
     renewable: bool = False
-    description: Optional[str] = None
 
 
 class SupplierCreate(SupplierBase):
@@ -52,16 +46,11 @@ class SupplierCreate(SupplierBase):
 
 class SupplierResponse(SupplierBase):
     id: int
-    created_at: Optional[datetime] = None
+    description: Optional[str] = None
+    created_at: str
 
-    model_config = {"from_attributes": True}
-
-
-# ── Simulation schemas ────────────────────────────────────────────────────────
-
-class SimulationRequest(BaseModel):
-    monthly_kwh: float
-    current_cost: float
+    class Config:
+        from_attributes = True
 
 
 class SupplierSimulationResult(BaseModel):
@@ -69,39 +58,44 @@ class SupplierSimulationResult(BaseModel):
     monthly_cost: float
     monthly_savings: float
     yearly_savings: float
-    savings_percentage: float
 
 
 class SimulationResponse(BaseModel):
     current_cost: float
     monthly_kwh: float
-    best_option: SupplierSimulationResult
+    best_option: Optional[SupplierSimulationResult]
     all_options: list[SupplierSimulationResult]
-    estimated_savings_min: float
-    estimated_savings_max: float
-    recommended_contract_type: str
-
-    model_config = {"from_attributes": True}
 
 
-# ── Partner schemas ─────────────────────────────────────────────────────────
+class SimulationRequest(BaseModel):
+    monthly_kwh: float
+    current_cost: float
 
-class PartnerResponse(BaseModel):
-    id: int
+
+class BillParsingResponse(BaseModel):
+    bill: BillResponse
+    message: str = "Bill parsed successfully"
+    extraction_details: Optional[dict] = None
+
+
+class PartnerBase(BaseModel):
     name: str
     slug: str
     website: Optional[str] = None
     logo_url: Optional[str] = None
     description: Optional[str] = None
 
-    model_config = {"from_attributes": True}
 
+class PartnerResponse(PartnerBase):
+    id: int
 
-# ── Lead schemas ──────────────────────────────────────────────────────────
+    class Config:
+        from_attributes = True
+
 
 class LeadCreate(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     phone: Optional[str] = None
     state: Optional[str] = None
     city: Optional[str] = None
@@ -114,8 +108,7 @@ class LeadCreate(BaseModel):
 
 
 class LeadStatusUpdate(BaseModel):
-    status: str   # new | sent | in_negotiation | converted | lost
-    notes: Optional[str] = None
+    status: str
 
 
 class LeadResponse(BaseModel):
@@ -133,7 +126,8 @@ class LeadResponse(BaseModel):
     status: str
     notes: Optional[str] = None
     partner: Optional[PartnerResponse] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: str
+    updated_at: str
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
