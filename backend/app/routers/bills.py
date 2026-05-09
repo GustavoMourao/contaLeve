@@ -19,6 +19,7 @@ async def upload_bill(
 ):
     """
     Upload an electricity bill (PDF or image) and receive parsed data.
+    Returns extraction confidence and method for transparency.
     """
     import os
 
@@ -35,6 +36,13 @@ async def upload_bill(
 
     parsed = parse_bill(file_bytes, file.filename or "bill.pdf")
 
+    # Check if we got actual values or if parsing failed
+    if parsed["monthly_kwh"] is None or parsed["total_cost"] is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract consumption or cost from bill. Please verify the bill format and try again.",
+        )
+
     db_bill = Bill(
         monthly_kwh=parsed["monthly_kwh"],
         tariff=parsed.get("tariff"),
@@ -47,7 +55,15 @@ async def upload_bill(
     db.commit()
     db.refresh(db_bill)
 
+    # Build extraction notes for transparency
+    extraction_notes = f"Consumption extracted via: {parsed['kwh_extraction_method']}. Cost extracted via: {parsed['cost_extraction_method']}."
+
     return UploadBillResponse(
         bill=BillResponse.model_validate(db_bill),
         message="Bill parsed successfully",
+        kwh_extraction_method=parsed["kwh_extraction_method"],
+        cost_extraction_method=parsed["cost_extraction_method"],
+        kwh_confidence=parsed["kwh_confidence"],
+        cost_confidence=parsed["cost_confidence"],
+        extraction_notes=extraction_notes,
     )
