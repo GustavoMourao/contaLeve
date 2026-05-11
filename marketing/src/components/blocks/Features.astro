@@ -1,0 +1,26 @@
+---
+import Section from '../primitives/Section.astro';
+import Container from '../primitives/Container.astro';
+import Heading from '../primitives/Heading.astro';
+
+interface Props {
+  heading?: string;
+  items: Array<{ title: string; body: string }>;
+}
+const { heading, items } = Astro.props;
+---
+<Section surface="muted">
+  <Container>
+    {heading && (
+      <Heading level={2} class="text-center mb-12">{heading}</Heading>
+    )}
+    <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <li class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-6">
+          <h3 class="text-lg font-semibold">{item.title}</h3>
+          <p class="mt-2 text-[var(--color-muted)] leading-relaxed">{item.body}</p>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</Section>

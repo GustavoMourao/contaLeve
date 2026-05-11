@@ -1,0 +1,40 @@
+---
+import '../../styles/global.css';
+import { buildTokenOverrideStyle } from '../../lib/tokens';
+import type { PageFrontmatter } from '../../lib/schema';
+
+interface Props {
+  pageId: string;
+  frontmatter: PageFrontmatter;
+}
+const { pageId, frontmatter } = Astro.props;
+
+const overrideStyle = buildTokenOverrideStyle({
+  pageId,
+  overrides: frontmatter.tokenOverrides,
+});
+
+const noIndex = frontmatter.seo?.noIndex ?? false;
+const canonical = frontmatter.seo?.canonical;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{frontmatter.title}</title>
+    <meta name="description" content={frontmatter.description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noIndex && <meta name="robots" content="noindex" />}
+    <meta property="og:title" content={frontmatter.title} />
+    <meta property="og:description" content={frontmatter.description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    {overrideStyle && <style set:html={overrideStyle} />}
+  </head>
+  <body data-page-id={pageId}>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

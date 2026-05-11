@@ -1,0 +1,62 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+import BasicLP from '../components/layouts/BasicLP.astro';
+import Hero from '../components/blocks/Hero.astro';
+import Features from '../components/blocks/Features.astro';
+import RichText from '../components/blocks/RichText.astro';
+import CTA from '../components/blocks/CTA.astro';
+
+import { getPageId } from '../lib/pages';
+import type { Block } from '../lib/schema';
+
+type PageCollection = 'icps';
+type PageEntry = CollectionEntry<PageCollection>;
+
+export async function getStaticPaths() {
+  const collections: PageCollection[] = ['icps'];
+  const entriesPerCollection = await Promise.all(
+    collections.map(async (collection) => {
+      const entries = await getCollection(collection);
+      return entries.map((entry) => ({ collection, entry }));
+    }),
+  );
+  const all = entriesPerCollection.flat();
+
+  return all.map(({ collection, entry }) => ({
+    params: { slug: entry.data.slug },
+    props: { collection, entry },
+  }));
+}
+
+interface Props {
+  collection: PageCollection;
+  entry: PageEntry;
+}
+const { collection, entry } = Astro.props;
+const frontmatter = entry.data;
+const pageId = getPageId(collection, frontmatter.slug);
+
+const { Content } = await render(entry);
+---
+<BasicLP pageId={pageId} frontmatter={frontmatter}>
+  {frontmatter.blocks.map((block: Block) => {
+    if (block.type === 'Hero') {
+      return <Hero headline={block.headline} subhead={block.subhead} cta={block.cta} />;
+    }
+    if (block.type === 'Features') {
+      return <Features heading={block.heading} items={block.items} />;
+    }
+    if (block.type === 'RichText') {
+      return (
+        <RichText>
+          <Content />
+        </RichText>
+      );
+    }
+    if (block.type === 'CTA') {
+      return <CTA headline={block.headline} cta={block.cta} />;
+    }
+    return null;
+  })}
+</BasicLP>

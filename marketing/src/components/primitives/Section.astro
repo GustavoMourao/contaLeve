@@ -1,0 +1,12 @@
+---
+interface Props {
+  surface?: 'default' | 'muted';
+  class?: string;
+}
+const { surface = 'default', class: className = '' } = Astro.props;
+const surfaceClass =
+  surface === 'muted' ? 'bg-[var(--color-surface)]' : 'bg-[var(--color-bg)]';
+---
+<section class={`py-16 sm:py-20 ${surfaceClass} ${className}`}>
+  <slot />
+</section>

@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import '../styles/global.css';
+
+const icps = await getCollection('icps');
+
+const all = icps.map((entry) => ({ collection: 'icps' as const, entry }));
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marketing — landing pages</title>
+    <meta name="description" content="Index of locally-built landing pages." />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body class="bg-[var(--color-bg)] text-[var(--color-fg)] min-h-screen">
+    <main class="mx-auto max-w-3xl px-6 py-16">
+      <h1 class="text-3xl font-bold tracking-tight">Landing pages disponíveis</h1>
+      <p class="mt-3 text-[var(--color-muted)]">
+        Esta página existe apenas para navegação local. Não é publicada em produção.
+      </p>
+      <ul class="mt-10 divide-y divide-[var(--color-border)] border-t border-b border-[var(--color-border)]">
+        {all.map(({ collection, entry }) => (
+          <li class="py-4">
+            <a
+              href={`/${entry.data.slug}`}
+              class="flex flex-col gap-1 hover:opacity-80 transition-opacity"
+            >
+              <span class="text-lg font-medium">{entry.data.title}</span>
+              <span class="text-sm text-[var(--color-muted)]">
+                {collection} · /{entry.data.slug}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+---
+import Section from '../primitives/Section.astro';
+import Container from '../primitives/Container.astro';
+import Heading from '../primitives/Heading.astro';
+import Button from '../primitives/Button.astro';
+
+interface Props {
+  headline?: string;
+  cta: { label: string; href: string };
+}
+const { headline, cta } = Astro.props;
+---
+<Section>
+  <Container class="text-center">
+    {headline && (
+      <Heading level={2} class="mb-8 text-balance">{headline}</Heading>
+    )}
+    <Button href={cta.href} variant="primary">{cta.label}</Button>
+  </Container>
+</Section>
