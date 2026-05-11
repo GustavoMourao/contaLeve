@@ -1,0 +1,324 @@
+---
+import Section from '../primitives/Section.astro';
+import Container from '../primitives/Container.astro';
+import Heading from '../primitives/Heading.astro';
+import { BASE_LEAD_FIELDS } from '../../lib/forms';
+import type { LeadFormField } from '../../lib/schema';
+
+interface Props {
+  formId?: string;
+  title?: string;
+  intro?: string;
+  submitLabel?: string;
+  successMessage?: string;
+  extraFields?: LeadFormField[];
+  /**
+   * Optional surface override for inline (in-body) usage so the form blends with
+   * surrounding prose rather than introducing a new colored band.
+   */
+  surface?: 'default' | 'muted';
+}
+
+const {
+  formId = 'main',
+  title,
+  intro,
+  submitLabel = 'Enviar',
+  successMessage = 'Recebemos seu contato. Em breve falaremos com você.',
+  extraFields = [],
+  surface = 'muted',
+} = Astro.props;
+
+const inputClass =
+  'mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]';
+
+const labelClass = 'block text-sm font-medium text-[var(--color-fg)]';
+
+const requiredMarkClass = 'text-[var(--color-accent)] ml-0.5';
+---
+<Section surface={surface}>
+  <Container class="max-w-xl">
+    <div id={formId} class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-6 sm:p-8">
+      {title && (
+        <Heading level={2} class="text-balance">{title}</Heading>
+      )}
+      {intro && (
+        <p class={`text-[var(--color-muted)] ${title ? 'mt-3' : ''}`}>{intro}</p>
+      )}
+
+      <form
+        data-lead-form
+        data-form-id={formId}
+        class="mt-6 space-y-4"
+        novalidate
+      >
+        {/* Honeypot — invisible to humans, catches naive bots. */}
+        <div aria-hidden="true" class="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <label>
+            Não preencha este campo
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        {BASE_LEAD_FIELDS.map((field) => (
+          <div>
+            <label class={labelClass} for={`${formId}-${field.key}`}>
+              {field.label}
+              {field.required && <span class={requiredMarkClass} aria-hidden="true">*</span>}
+            </label>
+            <input
+              id={`${formId}-${field.key}`}
+              name={field.key}
+              type={field.type === 'phone' ? 'tel' : field.type}
+              required={field.required}
+              placeholder={field.placeholder}
+              autocomplete={
+                field.type === 'email' ? 'email' :
+                field.type === 'phone' ? 'tel' :
+                field.key === 'name' ? 'name' : undefined
+              }
+              class={inputClass}
+            />
+          </div>
+        ))}
+
+        {extraFields.map((field) => {
+          const fieldId = `${formId}-${field.key}`;
+          if (field.type === 'select') {
+            return (
+              <div>
+                <label class={labelClass} for={fieldId}>
+                  {field.label}
+                  {field.required && <span class={requiredMarkClass} aria-hidden="true">*</span>}
+                </label>
+                <select id={fieldId} name={field.key} required={field.required} class={inputClass}>
+                  <option value="">Selecione...</option>
+                  {field.options.map((opt) => (
+                    <option value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            );
+          }
+          if (field.type === 'radio') {
+            return (
+              <fieldset>
+                <legend class={labelClass}>
+                  {field.label}
+                  {field.required && <span class={requiredMarkClass} aria-hidden="true">*</span>}
+                </legend>
+                <div class="mt-2 space-y-2">
+                  {field.options.map((opt, i) => (
+                    <label class="flex items-center gap-2 text-base">
+                      <input
+                        type="radio"
+                        name={field.key}
+                        value={opt}
+                        required={field.required && i === 0}
+                      />
+                      <span>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            );
+          }
+          if (field.type === 'checkbox') {
+            return (
+              <label class="flex items-start gap-2 text-base">
+                <input
+                  id={fieldId}
+                  name={field.key}
+                  type="checkbox"
+                  required={field.required}
+                  class="mt-1"
+                />
+                <span>
+                  {field.label}
+                  {field.required && <span class={requiredMarkClass} aria-hidden="true">*</span>}
+                </span>
+              </label>
+            );
+          }
+          return (
+            <div>
+              <label class={labelClass} for={fieldId}>
+                {field.label}
+                {field.required && <span class={requiredMarkClass} aria-hidden="true">*</span>}
+              </label>
+              <input
+                id={fieldId}
+                name={field.key}
+                type={
+                  field.type === 'phone' ? 'tel' :
+                  field.type === 'number' ? 'number' :
+                  field.type
+                }
+                required={field.required}
+                placeholder={'placeholder' in field ? field.placeholder : undefined}
+                min={'min' in field ? field.min : undefined}
+                max={'max' in field ? field.max : undefined}
+                class={inputClass}
+              />
+            </div>
+          );
+        })}
+
+        <button
+          type="submit"
+          class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--color-cta-bg)] px-5 py-3 text-base font-medium text-[var(--color-cta-fg)] transition-opacity duration-150 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+          data-submit-button
+          data-default-label={submitLabel}
+        >
+          {submitLabel}
+        </button>
+
+        <p
+          data-lead-error
+          class="hidden text-sm text-red-600"
+          role="alert"
+          aria-live="polite"
+        >
+          Não foi possível enviar agora. Tente novamente em alguns instantes.
+        </p>
+      </form>
+
+      <div data-lead-success hidden role="status" aria-live="polite" class="mt-4 rounded-md bg-[var(--color-surface)] p-4 text-[var(--color-fg)]">
+        {successMessage}
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<script>
+  type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
+
+  const ENDPOINT = (import.meta.env.PUBLIC_LEAD_ENDPOINT ?? '') as string;
+
+  function readUtmParams(): Record<string, string | null> {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      utmSource: params.get('utm_source'),
+      utmMedium: params.get('utm_medium'),
+      utmCampaign: params.get('utm_campaign'),
+      utmContent: params.get('utm_content'),
+      utmTerm: params.get('utm_term'),
+    };
+  }
+
+  function buildMetadata(form: HTMLFormElement): Record<string, unknown> {
+    const pageId = document.body.getAttribute('data-page-id') ?? null;
+    const [collection, ...slugParts] = (pageId ?? '').split('--');
+    return {
+      formId: form.getAttribute('data-form-id'),
+      pageSlug: slugParts.join('--') || null,
+      collection: collection || null,
+      domain: window.location.hostname,
+      url: window.location.href,
+      referrer: document.referrer || null,
+      submittedAt: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      ...readUtmParams(),
+    };
+  }
+
+  function buildPayload(form: HTMLFormElement) {
+    const data = new FormData(form);
+    const honeypot = String(data.get('website') ?? '').trim();
+    if (honeypot) {
+      return null; // bot-like submission, silently drop
+    }
+    data.delete('website');
+
+    const baseKeys = new Set(['name', 'email', 'phone']);
+    const base: Record<string, string> = {};
+    const extra: Record<string, unknown> = {};
+
+    for (const [key, value] of data.entries()) {
+      const stringValue = typeof value === 'string' ? value : '';
+      if (baseKeys.has(key)) {
+        base[key] = stringValue;
+      } else {
+        // Multiple checkbox values for the same name would collide; for the MVP
+        // we keep the simpler "last value wins" semantic. Multi-select can come
+        // later via Array.from(data.getAll(key)).
+        extra[key] = stringValue;
+      }
+    }
+
+    return {
+      base,
+      extra,
+      metadata: buildMetadata(form),
+    };
+  }
+
+  function setState(form: HTMLFormElement, state: SubmitState): void {
+    const button = form.querySelector<HTMLButtonElement>('[data-submit-button]');
+    const errorEl = form.querySelector<HTMLElement>('[data-lead-error]');
+    const successEl = form.parentElement?.querySelector<HTMLElement>('[data-lead-success]');
+
+    if (button) {
+      const defaultLabel = button.getAttribute('data-default-label') ?? button.textContent ?? '';
+      button.disabled = state === 'submitting';
+      button.textContent = state === 'submitting' ? 'Enviando...' : defaultLabel;
+    }
+
+    if (errorEl) {
+      errorEl.classList.toggle('hidden', state !== 'error');
+    }
+
+    if (state === 'success') {
+      form.hidden = true;
+      successEl?.removeAttribute('hidden');
+    }
+  }
+
+  async function submitPayload(payload: unknown): Promise<boolean> {
+    if (!ENDPOINT) {
+      // Sandbox mode: no endpoint configured. The form is fully usable for
+      // local development and design review. Real submission will be wired
+      // by Gustavo per docs/marketing/07-ci-cd-brief.md.
+      // eslint-disable-next-line no-console
+      console.info('[LeadForm] sandbox submit (no PUBLIC_LEAD_ENDPOINT set):', payload);
+      return true;
+    }
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  function handleSubmit(event: SubmitEvent): void {
+    const form = event.currentTarget as HTMLFormElement | null;
+    if (!form) return;
+    event.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const payload = buildPayload(form);
+    if (!payload) {
+      // Honeypot triggered — show success to avoid signalling bots.
+      setState(form, 'success');
+      return;
+    }
+
+    setState(form, 'submitting');
+    submitPayload(payload).then((ok) => {
+      setState(form, ok ? 'success' : 'error');
+    });
+  }
+
+  document.querySelectorAll<HTMLFormElement>('[data-lead-form]').forEach((form) => {
+    form.addEventListener('submit', handleSubmit);
+  });
+</script>

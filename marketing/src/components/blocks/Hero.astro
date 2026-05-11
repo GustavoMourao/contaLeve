@@ -1,0 +1,39 @@
+---
+import Section from '../primitives/Section.astro';
+import Container from '../primitives/Container.astro';
+import Heading from '../primitives/Heading.astro';
+import Button from '../primitives/Button.astro';
+
+interface Props {
+  headline: string;
+  subhead?: string;
+  cta: { label: string; href: string };
+  image?: { src: string; alt: string; width: number; height: number };
+}
+const { headline, subhead, cta, image } = Astro.props;
+---
+<Section>
+  <Container class="text-center">
+    <Heading level={1} class="text-balance">{headline}</Heading>
+    {subhead && (
+      <p class="mt-6 text-lg text-[var(--color-muted)] max-w-2xl mx-auto text-balance">
+        {subhead}
+      </p>
+    )}
+    <div class="mt-10">
+      <Button href={cta.href} variant="primary">{cta.label}</Button>
+    </div>
+    {image && (
+      <img
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="mt-12 mx-auto w-full max-w-3xl rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-sm"
+      />
+    )}
+  </Container>
+</Section>
