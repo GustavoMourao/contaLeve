@@ -6,8 +6,11 @@ import Hero from '../components/blocks/Hero.astro';
 import Features from '../components/blocks/Features.astro';
 import RichText from '../components/blocks/RichText.astro';
 import CTA from '../components/blocks/CTA.astro';
+import FAQ from '../components/blocks/FAQ.astro';
+import LeadForm from '../components/blocks/LeadForm.astro';
 
 import { getPageId } from '../lib/pages';
+import { mdxComponents } from '../lib/mdxComponents';
 import type { Block } from '../lib/schema';
 
 type PageCollection = 'icps';
@@ -42,7 +45,14 @@ const { Content } = await render(entry);
 <BasicLP pageId={pageId} frontmatter={frontmatter}>
   {frontmatter.blocks.map((block: Block) => {
     if (block.type === 'Hero') {
-      return <Hero headline={block.headline} subhead={block.subhead} cta={block.cta} />;
+      return (
+        <Hero
+          headline={block.headline}
+          subhead={block.subhead}
+          cta={block.cta}
+          image={block.image}
+        />
+      );
     }
     if (block.type === 'Features') {
       return <Features heading={block.heading} items={block.items} />;
@@ -50,12 +60,27 @@ const { Content } = await render(entry);
     if (block.type === 'RichText') {
       return (
         <RichText>
-          <Content />
+          <Content components={mdxComponents} />
         </RichText>
       );
     }
     if (block.type === 'CTA') {
       return <CTA headline={block.headline} cta={block.cta} />;
+    }
+    if (block.type === 'FAQ') {
+      return <FAQ heading={block.heading} items={block.items} />;
+    }
+    if (block.type === 'LeadForm') {
+      return (
+        <LeadForm
+          formId={block.formId}
+          title={block.title}
+          intro={block.intro}
+          submitLabel={block.submitLabel}
+          successMessage={block.successMessage}
+          extraFields={block.extraFields}
+        />
+      );
     }
     return null;
   })}

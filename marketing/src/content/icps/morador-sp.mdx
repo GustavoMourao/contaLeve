@@ -38,6 +38,23 @@ Por muitos anos, só grandes empresas podiam escolher seu fornecedor de energia.
 trocar de fornecedor sem mexer na infraestrutura — a mesma rede, o mesmo poste, a mesma
 luz, só que mais barata.
 
+Para quem mora em São Paulo, o cálculo costuma ser ainda mais favorável: a tarifa local
+está entre as mais altas do país, então cada centavo trocado por um fornecedor mais
+barato vira economia direta no fim do mês.
+
+<LeadForm
+  formId="ver-economia"
+  title="Quanto sua casa pode economizar?"
+  intro="Preencha os dados abaixo e simulamos sua economia em poucos segundos."
+  submitLabel="Simular minha economia"
+  successMessage="Recebemos seus dados. Em até 1 dia útil enviamos sua simulação personalizada."
+  extraFields={[
+    { type: 'select', key: 'monthlyBill', label: 'Quanto você paga por mês na conta de luz?', required: true, options: ['Até R$ 200', 'R$ 200 a 500', 'R$ 500 a 1.000', 'Acima de R$ 1.000'] },
+    { type: 'select', key: 'distributor', label: 'Qual sua distribuidora hoje?', required: true, options: ['Enel SP', 'EDP SP', 'Outra'] },
+    { type: 'checkbox', key: 'consentMarketing', label: 'Aceito receber a simulação e novidades por e-mail e WhatsApp.', required: true },
+  ]}
+/>
+
 ## Para quem este serviço faz mais sentido
 
 - Moradores de São Paulo capital ou região metropolitana
@@ -48,3 +65,15 @@ luz, só que mais barata.
 
 Você pode voltar para o modelo antigo a qualquer momento. Não há multa nem fidelidade
 para residências, é uma escolha que pode ser revertida.
+
+<FAQ
+  heading="Dúvidas comuns de quem mora em SP"
+  items={[
+    { question: "A qualidade da energia muda quando eu troco de fornecedor?", answer: "Não. A rede elétrica que entrega a energia na sua casa continua sendo a mesma, operada pela Enel. O que muda é apenas a empresa que vende a energia. A luz, a tomada e a infraestrutura são exatamente iguais." },
+    { question: "Vou receber duas contas todo mês?", answer: "Para residências, a conta normalmente vem unificada. Em alguns casos pode haver um pequeno componente separado para o uso da rede, mas isso fica claro logo na primeira simulação." },
+    { question: "E se faltar luz, eu ligo para quem?", answer: "Continua sendo a Enel — o número de emergência e o atendimento técnico não mudam. A distribuidora local segue responsável pela manutenção da rede." },
+    { question: "Quanto tempo demora para a troca acontecer?", answer: "Após a contratação, a migração costuma acontecer entre 30 e 60 dias, na sua próxima virada de fatura. Você não fica sem energia em momento nenhum durante o processo." },
+    { question: "Posso voltar para o modelo antigo se eu não gostar?", answer: "Sim. Para residências, a regra atual permite voltar ao modelo regulado, sem multa. Antes de qualquer escolha, mostramos as condições do fornecedor para você decidir com segurança." },
+    { question: "Preciso ter um consumo mínimo para valer a pena?", answer: "Em geral, residências com conta acima de R$ 200 por mês são as que mais ganham com a troca. Mesmo abaixo disso pode valer, mas a economia é menor — a simulação mostra exatamente o seu caso." },
+  ]}
+/>
