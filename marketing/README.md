@@ -2,7 +2,7 @@
 
 Astro-based engine that renders multiple pt-BR landing pages from MDX content.
 
-The architecture, content model, and roadmap live in `../docs/marketing/`. **Read those before changing anything substantive.** The most important ones to start with:
+The architecture, content model, and roadmap live in `../docs/marketing/`. **Read those before changing anything substantive.** While developing, you can also browse the same files rendered at **`/docs`** (English handbook, `noindex`). The most important ones to start with:
 
 - [`../docs/marketing/01-architecture.md`](../docs/marketing/01-architecture.md) — stack, folders, page model
 - [`../docs/marketing/02-content-model.md`](../docs/marketing/02-content-model.md) — frontmatter schema, blocks, authoring rules
@@ -29,7 +29,7 @@ npm install
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Local dev server with HMR at `http://localhost:4321` |
+| `npm run dev` | Local dev server with HMR at `http://localhost:4321` (`/`, `/docs`, `/design-system`, LP slugs) |
 | `npm run build` | Static site build to `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run check` | TypeScript + Astro content schema check |
@@ -53,17 +53,23 @@ marketing/
 │   │   └── icps/                     # one MDX per ICP-targeted LP
 │   ├── components/
 │   │   ├── blocks/                   # Hero, Features, RichText, CTA
-│   │   ├── layouts/                  # BasicLP
+│   │   ├── layouts/                  # BasicLP, DocsLayout (preview handbook)
 │   │   └── primitives/               # Container, Section, Heading, Button
 │   ├── lib/                          # pure logic (no Astro/JSX imports)
 │   │   ├── schema.ts                 # zod schemas + token override keys
 │   │   ├── tokens.ts                 # scoped token override CSS builder
-│   │   └── pages.ts                  # page id, block split helpers
+│   │   ├── pages.ts                  # page id, block split helpers
+│   │   ├── handbookNav.ts            # sidebar titles for /docs handbook
 │   ├── pages/
 │   │   ├── index.astro               # local browse-all index (noindex)
+│   │   ├── design-system.astro       # token + primitive gallery (noindex)
+│   │   ├── docs/
+│   │   │   ├── index.astro           # handbook index (noindex)
+│   │   │   └── [slug].astro          # renders ../docs/marketing/*.md
 │   │   └── [...slug].astro           # generic catch-all renderer
 │   └── styles/
-│       └── global.css                # Tailwind v4 + design tokens
+│       ├── global.css                # Tailwind v4 + design tokens
+│       └── docs-markdown.css         # scoped prose for handbook pages
 └── tests/
     └── lib/                          # vitest unit tests for pure libs
 ```

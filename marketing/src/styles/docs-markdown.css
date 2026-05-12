@@ -1,0 +1,133 @@
+/**
+ * Typography for rendered markdown handbook (`/docs/*`).
+ * Scoped under `.docs-markdown` so LP MDX and global styles stay unaffected.
+ */
+.docs-markdown {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ds-charcoal);
+}
+
+.docs-markdown > :first-child {
+  margin-top: 0;
+}
+
+.docs-markdown h1 {
+  font-family: var(--ds-font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: var(--ds-tracking-tight);
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+
+.docs-markdown h2 {
+  font-family: var(--ds-font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 2rem 0 0.75rem;
+  line-height: 1.25;
+  letter-spacing: var(--ds-tracking-tight);
+}
+
+.docs-markdown h3 {
+  font-family: var(--ds-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.docs-markdown h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.35rem;
+}
+
+.docs-markdown p {
+  margin: 0.65rem 0;
+}
+
+.docs-markdown ul,
+.docs-markdown ol {
+  margin: 0.65rem 0;
+  padding-left: 1.35rem;
+}
+
+.docs-markdown li {
+  margin: 0.25rem 0;
+}
+
+.docs-markdown a {
+  color: var(--ds-charcoal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.docs-markdown a:hover {
+  opacity: 0.82;
+}
+
+.docs-markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--ds-offwhite);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  border: 1px solid var(--ds-charcoal);
+}
+
+.docs-markdown pre {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 2.5px solid var(--ds-charcoal);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-white);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.docs-markdown pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.docs-markdown blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--ds-green);
+  color: var(--ds-gray);
+}
+
+.docs-markdown hr {
+  border: 0;
+  border-top: 2px solid var(--ds-charcoal);
+  margin: 2rem 0;
+}
+
+.docs-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+}
+
+.docs-markdown th,
+.docs-markdown td {
+  border: 1px solid var(--ds-charcoal);
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.docs-markdown th {
+  background: var(--ds-offwhite);
+  font-weight: 700;
+}
+
+.docs-markdown strong {
+  font-weight: 700;
+}

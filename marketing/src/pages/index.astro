@@ -27,12 +27,18 @@ const all = icps.map((entry) => ({ collection: 'icps' as const, entry }));
       <p class="mt-3 text-[var(--color-muted)]">
         Esta página existe apenas para navegação local. Não é publicada em produção.
       </p>
-      <p class="mt-4">
+      <p class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
         <a
           href="/design-system"
-          class="text-sm font-semibold text-[var(--color-fg)] underline decoration-2 underline-offset-4 hover:opacity-80"
+          class="text-[var(--color-fg)] underline decoration-2 underline-offset-4 hover:opacity-80"
         >
-          Design system (tokens e componentes)
+          Design system
+        </a>
+        <a
+          href="/docs"
+          class="text-[var(--color-fg)] underline decoration-2 underline-offset-4 hover:opacity-80"
+        >
+          Handbook (en)
         </a>
       </p>
       <ul class="mt-10 divide-y divide-[var(--color-border)] border-t border-b border-[var(--color-border)]">
