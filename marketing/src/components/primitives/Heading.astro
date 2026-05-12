@@ -4,10 +4,13 @@ interface Props {
   class?: string;
 }
 const { level, class: className = '' } = Astro.props;
+
+const display = 'font-display text-ds-charcoal';
+
 const sizeByLevel: Record<1 | 2 | 3, string> = {
-  1: 'text-4xl sm:text-5xl font-bold tracking-tight',
-  2: 'text-2xl sm:text-3xl font-semibold tracking-tight',
-  3: 'text-xl font-semibold',
+  1: `${display} text-4xl font-black tracking-[var(--ds-tracking-display)] sm:text-5xl`,
+  2: `${display} text-2xl font-bold tracking-[var(--ds-tracking-tight)] sm:text-3xl`,
+  3: `${display} text-lg font-semibold leading-snug sm:text-xl`,
 };
 const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
 ---

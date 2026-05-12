@@ -16,12 +16,12 @@ const { headline, subhead, cta, image } = Astro.props;
   <Container class="text-center">
     <Heading level={1} class="text-balance">{headline}</Heading>
     {subhead && (
-      <p class="mt-6 text-lg text-[var(--color-muted)] max-w-2xl mx-auto text-balance">
+      <p class="mt-6 max-w-2xl mx-auto text-balance text-lg text-ds-gray">
         {subhead}
       </p>
     )}
     <div class="mt-10">
-      <Button href={cta.href} variant="primary">{cta.label}</Button>
+      <Button href={cta.href} variant="vivid">{cta.label}</Button>
     </div>
     {image && (
       <img
@@ -32,7 +32,7 @@ const { headline, subhead, cta, image } = Astro.props;
         loading="eager"
         decoding="async"
         fetchpriority="high"
-        class="mt-12 mx-auto w-full max-w-3xl rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-sm"
+        class="mt-12 mx-auto w-full max-w-3xl rounded-card border-[2.5px] border-ds-charcoal shadow-ds-md"
       />
     )}
   </Container>
