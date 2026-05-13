@@ -4,6 +4,9 @@
  *
  * Naming: `--ds-*` = canonical design-system tokens.
  *         `--color-*` = compatibility aliases for content `tokenOverrides` (see src/lib/tokens.ts).
+ *
+ * When you add or rename a token here, also update `src/lib/designTokenPreview.ts` so `/design-system`
+ * stays accurate, and refresh `docs/marketing/08-design-system.md` if the architecture changes.
  */
 
 :root {

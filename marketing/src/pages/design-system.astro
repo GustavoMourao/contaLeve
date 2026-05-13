@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import DesignTokenPreview from '../components/preview/DesignTokenPreview.astro';
 import Alert from '../components/primitives/Alert.astro';
 import Badge from '../components/primitives/Badge.astro';
 import Button from '../components/primitives/Button.astro';
@@ -40,7 +41,9 @@ const lbl =
             </h1>
             <p class="mt-2 max-w-xl text-sm text-ds-gray leading-relaxed">
               Tokens em <code class="rounded bg-ds-offwhite px-1.5 py-0.5 font-mono text-xs">design-tokens.css</code> ·
-              Documentação em <code class="rounded bg-ds-offwhite px-1.5 py-0.5 font-mono text-xs">docs/marketing/08-design-system.md</code>
+              Documentação e regras de PR em
+              <code class="rounded bg-ds-offwhite px-1.5 py-0.5 font-mono text-xs">docs/marketing/08-design-system.md</code>
+              (atualizar preview e doc ao adicionares tokens ou componentes).
             </p>
           </div>
           <div class="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -60,44 +63,7 @@ const lbl =
         </div>
 
         <div class="grid grid-cols-1 gap-3.5 md:grid-cols-12">
-          <!-- Paleta -->
-          <section
-            class="md:col-span-5 rounded-card border-[2.5px] border-ds-charcoal bg-ds-white p-6 shadow-ds-md sm:p-7"
-          >
-            <h2 class={lbl}>Paleta principal</h2>
-            <div class="grid grid-cols-2 gap-2">
-              <div
-                class="col-span-2 flex min-h-[5.5rem] flex-col justify-end rounded-lg border-2 border-ds-charcoal bg-ds-charcoal p-3 text-ds-offwhite"
-              >
-                <span class="text-[11px] font-bold uppercase tracking-wide">Charcoal</span>
-                <span class="font-mono text-[11px] opacity-80">#191A23</span>
-              </div>
-              <div
-                class="flex min-h-[4.5rem] flex-col justify-end rounded-lg border-2 border-ds-charcoal bg-ds-offwhite p-3"
-              >
-                <span class="text-[11px] font-bold uppercase tracking-wide">Off-white</span>
-                <span class="font-mono text-[11px] text-ds-gray">#F3F3F3</span>
-              </div>
-              <div
-                class="flex min-h-[4.5rem] flex-col justify-end rounded-lg border-2 border-ds-charcoal bg-ds-gray p-3 text-ds-offwhite"
-              >
-                <span class="text-[11px] font-bold uppercase tracking-wide">Gray</span>
-                <span class="font-mono text-[11px] opacity-90">#888888</span>
-              </div>
-              <div
-                class="col-span-2 flex min-h-[3.5rem] flex-col justify-center rounded-lg border-2 border-ds-charcoal bg-ds-green p-3"
-              >
-                <span class="text-[11px] font-bold uppercase tracking-wide text-[#2a5200]">Green · primário</span>
-                <span class="font-mono text-[11px] text-[#3d7a00]">#A3E635</span>
-              </div>
-              <div
-                class="col-span-2 flex min-h-[3.5rem] flex-col justify-center rounded-lg border-2 border-ds-charcoal bg-ds-green-vivid p-3"
-              >
-                <span class="text-[11px] font-bold uppercase tracking-wide text-[#1a4200]">Green vivid · CTA</span>
-                <span class="font-mono text-[11px] text-[#1a4200]">#C0FF2B</span>
-              </div>
-            </div>
-          </section>
+          <DesignTokenPreview lbl={lbl} />
 
           <!-- Tipografia -->
           <section

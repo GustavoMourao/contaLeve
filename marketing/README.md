@@ -54,12 +54,14 @@ marketing/
 │   ├── components/
 │   │   ├── blocks/                   # Hero, Features, RichText, CTA
 │   │   ├── layouts/                  # BasicLP, DocsLayout (preview handbook)
+│   │   ├── preview/                  # DesignTokenPreview (tokens UI for /design-system)
 │   │   └── primitives/               # Container, Section, Heading, Button
 │   ├── lib/                          # pure logic (no Astro/JSX imports)
 │   │   ├── schema.ts                 # zod schemas + token override keys
 │   │   ├── tokens.ts                 # scoped token override CSS builder
 │   │   ├── pages.ts                  # page id, block split helpers
 │   │   ├── handbookNav.ts            # sidebar titles for /docs handbook
+│   │   └── designTokenPreview.ts     # token list for /design-system preview
 │   ├── pages/
 │   │   ├── index.astro               # local browse-all index (noindex)
 │   │   ├── design-system.astro       # token + primitive gallery (noindex)
@@ -105,5 +107,6 @@ The architecture is designed so each of those can be added without touching the 
 
 - Pure logic goes in `src/lib/` with no Astro or framework imports — that's the only code reachable by Vitest. Anything in `src/components/` is presentation only.
 - Components read tokens (e.g. `var(--color-cta-bg)`), never hard-coded values. Token overrides flow through automatically.
+- **Design system**: new or renamed tokens require updates to `src/lib/designTokenPreview.ts` (and `@theme` in `global.css` when exposing utilities); new primitives need examples on `/design-system`. See `docs/marketing/08-design-system.md` for the full PR checklist.
 - Frontmatter validation errors fail the build with a readable message — that's the contract. If you find yourself working around the schema, change the schema, don't bypass it.
 - Adding a block is additive: extend the discriminated union in `schema.ts`, add a component in `components/blocks/`, add a branch in `[...slug].astro`. No existing pages should break.
