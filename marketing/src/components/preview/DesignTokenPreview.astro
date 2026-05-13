@@ -15,9 +15,11 @@ import {
 
 interface Props {
   lbl: string;
+  /** Scroll target for in-page nav (e.g. `tokens`). */
+  anchorId?: string;
 }
 
-const { lbl } = Astro.props;
+const { lbl, anchorId = 'tokens' } = Astro.props;
 
 function swatchTextClass(row: ColorTokenRow): string {
   return row.labelOn === 'light' ? 'text-ds-offwhite' : 'text-ds-charcoal';
@@ -25,7 +27,8 @@ function swatchTextClass(row: ColorTokenRow): string {
 ---
 
 <section
-  class="rounded-card border-[2.5px] border-ds-charcoal bg-ds-white p-6 shadow-ds-md sm:p-7 md:col-span-12"
+  id={anchorId}
+  class="scroll-mt-28 rounded-card border-[2.5px] border-ds-charcoal bg-ds-white p-6 shadow-ds-md sm:p-7 md:col-span-12"
   aria-labelledby="ds-token-preview-heading"
 >
   <h2 id="ds-token-preview-heading" class={lbl}>Tokens CSS · referência</h2>

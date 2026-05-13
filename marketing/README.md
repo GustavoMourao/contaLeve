@@ -54,14 +54,15 @@ marketing/
 │   ├── components/
 │   │   ├── blocks/                   # Hero, Features, RichText, CTA
 │   │   ├── layouts/                  # BasicLP, DocsLayout (preview handbook)
-│   │   ├── preview/                  # DesignTokenPreview (tokens UI for /design-system)
+│   │   ├── preview/                  # PreviewTopNav, DesignSystemSidebar, DesignTokenPreview
 │   │   └── primitives/               # Container, Section, Heading, Button
 │   ├── lib/                          # pure logic (no Astro/JSX imports)
 │   │   ├── schema.ts                 # zod schemas + token override keys
 │   │   ├── tokens.ts                 # scoped token override CSS builder
 │   │   ├── pages.ts                  # page id, block split helpers
 │   │   ├── handbookNav.ts            # sidebar titles for /docs handbook
-│   │   └── designTokenPreview.ts     # token list for /design-system preview
+│   │   ├── designTokenPreview.ts     # token list for /design-system preview
+│   │   └── previewNav.ts             # preview hub top nav + design-system anchor ids
 │   ├── pages/
 │   │   ├── index.astro               # local browse-all index (noindex)
 │   │   ├── design-system.astro       # token + primitive gallery (noindex)

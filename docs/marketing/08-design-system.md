@@ -39,6 +39,16 @@ Elementos atómicos reutilizáveis: `Button`, `Heading`, `Section`, `Container`,
 - Semântica: success / warning / error (pink) / info (teal), com variantes **vivid** para texto sobre fundo escuro — ver comentários em `design-tokens.css` e cheat-sheet HTML de referência.
 - Tipografia: **Epilogue** (display / dados fortes), **Outfit** (corpo e UI). Ícones: Lucide, traço monoline ~2px (SVG inline onde ainda não há pacote).
 
+## Navegação do preview (hub unificado)
+
+As páginas **apenas de preview** (`/`, `/design-system`, `/docs`) partilham o mesmo cromo:
+
+- **Barra horizontal no topo** (`PreviewTopNav`): alterna entre Campaigns (índice de LPs), Design system e Handbook. Ficheiro: `marketing/src/components/preview/PreviewTopNav.astro`; dados em `marketing/src/lib/previewNav.ts`.
+- **Handbook** (`/docs/*`): barra lateral com a lista de ficheiros Markdown (layout `DocsLayout.astro`).
+- **Design system** (`/design-system`): barra lateral com **âncoras na mesma página** (componente `DesignSystemSidebar.astro`; lista de ids em `previewNav.ts` → `designSystemNavItems`). Em ecrãs estreitos, os mesmos destinos aparecem como **chips** horizontais por baixo do topo.
+
+As landing pages reais (`BasicLP`, rotas `/{slug}`) **não** incluem este cromo — continuam limpas para o domínio de campanha.
+
 ## Página de referência visual
 
 - URL local: `/design-system`

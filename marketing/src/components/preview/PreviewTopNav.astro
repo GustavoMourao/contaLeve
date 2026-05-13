@@ -1,0 +1,67 @@
+---
+import type { PreviewHubArea } from '../../lib/previewNav';
+import { previewTopNavItems } from '../../lib/previewNav';
+
+interface Props {
+  current: PreviewHubArea;
+}
+
+const { current } = Astro.props;
+
+const linkBase =
+  'rounded-md px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ds-green focus-visible:ring-offset-2 focus-visible:ring-offset-ds-offwhite';
+const linkActive = 'bg-ds-green font-semibold text-ds-charcoal';
+const linkIdle = 'font-medium text-ds-charcoal hover:bg-ds-white/90';
+---
+
+<a
+  href="#main"
+  class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-ds-green-vivid focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-ds-charcoal"
+>
+  Skip to content
+</a>
+<header
+  class="sticky top-0 z-50 border-b-[2.5px] border-ds-charcoal bg-[var(--color-surface)]/95 backdrop-blur-sm"
+  role="banner"
+>
+  <div class="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <span class="font-display text-sm font-black tracking-[var(--ds-tracking-tight)] text-ds-charcoal"> Preview </span>
+    <nav aria-label="Áreas do preview" class="flex flex-wrap items-center gap-1 sm:gap-2">
+      {
+        previewTopNavItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={[linkBase, item.area === current ? linkActive : linkIdle]}
+            aria-current={item.area === current ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+</style>
