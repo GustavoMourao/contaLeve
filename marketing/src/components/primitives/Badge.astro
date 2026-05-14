@@ -1,0 +1,24 @@
+---
+export type BadgeVariant = 'lime' | 'vivid' | 'dark' | 'white' | 'outline';
+
+interface Props {
+  variant?: BadgeVariant;
+  class?: string;
+}
+
+const { variant = 'lime', class: className = '' } = Astro.props;
+
+const byVariant: Record<BadgeVariant, string> = {
+  lime: 'bg-ds-green text-ds-charcoal',
+  vivid: 'bg-ds-green-vivid text-ds-charcoal',
+  dark: 'bg-ds-charcoal text-ds-offwhite',
+  white: 'bg-ds-white text-ds-charcoal',
+  outline: 'bg-transparent text-ds-charcoal',
+};
+
+const base =
+  'inline-flex items-center rounded-pill border-[2.5px] border-ds-charcoal px-3 py-1 text-[11px] font-bold uppercase tracking-wide';
+---
+<span class={`${base} ${byVariant[variant]} ${className}`}>
+  <slot />
+</span>

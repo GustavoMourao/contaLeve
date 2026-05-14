@@ -1,0 +1,43 @@
+---
+import {
+  controlFieldClassNames,
+  controlLabelClassNames,
+  requiredMarkClassNames,
+} from '../../lib/fieldStyles';
+
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  rows?: number;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  required = false,
+  placeholder,
+  rows = 4,
+  class: className = '',
+} = Astro.props;
+
+const field = controlFieldClassNames();
+---
+<div>
+  <label class={controlLabelClassNames()} for={id}>
+    {label}
+    {required && <span class={requiredMarkClassNames()} aria-hidden="true">*</span>}
+  </label>
+  <textarea
+    id={id}
+    name={name}
+    required={required}
+    placeholder={placeholder}
+    rows={rows}
+    class={`${field} min-h-[7.5rem] resize-y ${className}`}
+  />
+</div>

@@ -1,0 +1,75 @@
+/**
+ * Design tokens — single source of truth for the visual language.
+ * Brand name/logo may change; these values are stable.
+ *
+ * Naming: `--ds-*` = canonical design-system tokens.
+ *         `--color-*` = compatibility aliases for content `tokenOverrides` (see src/lib/tokens.ts).
+ *
+ * When you add or rename a token here, also update `src/lib/designTokenPreview.ts` so `/design-system`
+ * stays accurate, and refresh `docs/marketing/08-design-system.md` if the architecture changes.
+ */
+
+:root {
+  /* ── Core palette ── */
+  --ds-charcoal: #191a23;
+  --ds-offwhite: #f3f3f3;
+  --ds-gray: #888888;
+  --ds-white: #ffffff;
+
+  /* ── Brand green (no diluted steps) ── */
+  --ds-green: #a3e635;
+  --ds-green-vivid: #c0ff2b;
+
+  /* ── Semantic (light surfaces) ── */
+  --ds-sem-success: #a3e635;
+  --ds-sem-warning: #ffd60a;
+  --ds-sem-error: #f02070;
+  --ds-sem-info: #0bc4ad;
+
+  /* ── Semantic vivid (on charcoal / dark UI) ── */
+  --ds-sem-success-vivid: #c0ff2b;
+  --ds-sem-warning-vivid: #ffe433;
+  --ds-sem-error-vivid: #ff3d8a;
+  --ds-sem-info-vivid: #0ffde0;
+
+  /* ── Structure ── */
+  --ds-border-width: 2.5px;
+  --ds-border: var(--ds-border-width) solid var(--ds-charcoal);
+  --ds-shadow-sm: 3px 3px 0 var(--ds-charcoal);
+  --ds-shadow-md: 5px 5px 0 var(--ds-charcoal);
+  --ds-shadow-accent: 5px 5px 0 var(--ds-green);
+
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 12px;
+  --ds-radius-card: 18px;
+  --ds-radius-pill: 100px;
+
+  /* ── Typography ── */
+  --ds-font-display: 'Epilogue', ui-sans-serif, system-ui, sans-serif;
+  --ds-font-body: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+  --ds-tracking-display: -0.035em;
+  --ds-tracking-tight: -0.02em;
+
+  /* ── Spacing scale (4px base; cheat-sheet labels = half-value in px when shown as “4,8,12…”) ── */
+  --ds-space-1: 0.25rem; /* 4px */
+  --ds-space-2: 0.5rem; /* 8px */
+  --ds-space-3: 0.75rem; /* 12px */
+  --ds-space-4: 1rem; /* 16px */
+  --ds-space-6: 1.5rem; /* 24px */
+  --ds-space-8: 2rem; /* 32px */
+
+  /* ── Aliases: content collection tokenOverrides (src/lib/schema.ts) ── */
+  --color-bg: var(--ds-white);
+  --color-surface: var(--ds-offwhite);
+  --color-fg: var(--ds-charcoal);
+  --color-muted: var(--ds-gray);
+  --color-border: var(--ds-charcoal);
+  --color-cta-bg: var(--ds-green-vivid);
+  --color-cta-fg: var(--ds-charcoal);
+  --color-accent: var(--ds-green);
+
+  /* Focus ring uses accent */
+  --color-focus: var(--ds-green);
+}

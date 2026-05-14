@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+
+import DocsLayout from '../../components/layouts/DocsLayout.astro';
+import { handbookNavTitle } from '../../lib/handbookNav';
+
+const handbook = (await getCollection('handbook')).sort((a, b) => a.id.localeCompare(b.id));
+---
+
+<DocsLayout title="Marketing handbook" currentSlug={null}>
+  <div class="docs-markdown max-w-3xl">
+    <p class="text-ds-gray">
+      Internal documentation (en-US). Source files live in the repo at
+      <code class="font-mono text-sm">docs/marketing/</code>. This index is for preview and QA only (<code class="font-mono text-sm">noindex</code>).
+    </p>
+    <h2 class="!mt-8 font-display text-xl font-bold">All pages</h2>
+    <ul class="mt-4 space-y-2">
+      {
+        handbook.map((e) => (
+          <li>
+            <a
+              href={`/docs/${e.id.replace(/\.md$/i, '')}`}
+              class="text-base font-semibold text-ds-charcoal underline decoration-2 underline-offset-4"
+            >
+              {handbookNavTitle(e.id.replace(/\.md$/i, ''))}
+            </a>
+            <span class="ml-2 font-mono text-xs text-ds-gray">/{e.id.replace(/\.md$/i, '')}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</DocsLayout>

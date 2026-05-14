@@ -2,7 +2,7 @@
 
 Astro-based engine that renders multiple pt-BR landing pages from MDX content.
 
-The architecture, content model, and roadmap live in `../docs/marketing/`. **Read those before changing anything substantive.** The most important ones to start with:
+The architecture, content model, and roadmap live in `../docs/marketing/`. **Read those before changing anything substantive.** While developing, you can also browse the same files rendered at **`/docs`** (English handbook, `noindex`). The most important ones to start with:
 
 - [`../docs/marketing/01-architecture.md`](../docs/marketing/01-architecture.md) — stack, folders, page model
 - [`../docs/marketing/02-content-model.md`](../docs/marketing/02-content-model.md) — frontmatter schema, blocks, authoring rules
@@ -29,7 +29,7 @@ npm install
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Local dev server with HMR at `http://localhost:4321` |
+| `npm run dev` | Local dev server with HMR at `http://localhost:4321` (`/`, `/docs`, `/design-system`, LP slugs) |
 | `npm run build` | Static site build to `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run check` | TypeScript + Astro content schema check |
@@ -53,17 +53,26 @@ marketing/
 │   │   └── icps/                     # one MDX per ICP-targeted LP
 │   ├── components/
 │   │   ├── blocks/                   # Hero, Features, RichText, CTA
-│   │   ├── layouts/                  # BasicLP
+│   │   ├── layouts/                  # BasicLP, DocsLayout (preview handbook)
+│   │   ├── preview/                  # PreviewTopNav, DesignSystemSidebar, DesignTokenPreview
 │   │   └── primitives/               # Container, Section, Heading, Button
 │   ├── lib/                          # pure logic (no Astro/JSX imports)
 │   │   ├── schema.ts                 # zod schemas + token override keys
 │   │   ├── tokens.ts                 # scoped token override CSS builder
-│   │   └── pages.ts                  # page id, block split helpers
+│   │   ├── pages.ts                  # page id, block split helpers
+│   │   ├── handbookNav.ts            # sidebar titles for /docs handbook
+│   │   ├── designTokenPreview.ts     # token list for /design-system preview
+│   │   └── previewNav.ts             # preview hub top nav + design-system anchor ids
 │   ├── pages/
 │   │   ├── index.astro               # local browse-all index (noindex)
+│   │   ├── design-system.astro       # token + primitive gallery (noindex)
+│   │   ├── docs/
+│   │   │   ├── index.astro           # handbook index (noindex)
+│   │   │   └── [slug].astro          # renders ../docs/marketing/*.md
 │   │   └── [...slug].astro           # generic catch-all renderer
 │   └── styles/
-│       └── global.css                # Tailwind v4 + design tokens
+│       ├── global.css                # Tailwind v4 + design tokens
+│       └── docs-markdown.css         # scoped prose for handbook pages
 └── tests/
     └── lib/                          # vitest unit tests for pure libs
 ```
@@ -99,5 +108,6 @@ The architecture is designed so each of those can be added without touching the 
 
 - Pure logic goes in `src/lib/` with no Astro or framework imports — that's the only code reachable by Vitest. Anything in `src/components/` is presentation only.
 - Components read tokens (e.g. `var(--color-cta-bg)`), never hard-coded values. Token overrides flow through automatically.
+- **Design system**: new or renamed tokens require updates to `src/lib/designTokenPreview.ts` (and `@theme` in `global.css` when exposing utilities); new primitives need examples on `/design-system`. See `docs/marketing/08-design-system.md` for the full PR checklist.
 - Frontmatter validation errors fail the build with a readable message — that's the contract. If you find yourself working around the schema, change the schema, don't bypass it.
 - Adding a block is additive: extend the discriminated union in `schema.ts`, add a component in `components/blocks/`, add a branch in `[...slug].astro`. No existing pages should break.

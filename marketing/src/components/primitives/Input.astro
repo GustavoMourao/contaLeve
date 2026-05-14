@@ -1,0 +1,46 @@
+---
+import {
+  controlFieldClassNames,
+  controlLabelClassNames,
+  requiredMarkClassNames,
+} from '../../lib/fieldStyles';
+
+interface Props {
+  id: string;
+  name: string;
+  type?: 'text' | 'email' | 'tel' | 'number' | 'url' | 'search' | 'password';
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  autocomplete?: string;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  type = 'text',
+  label,
+  required = false,
+  placeholder,
+  autocomplete,
+  class: className = '',
+} = Astro.props;
+
+const field = controlFieldClassNames();
+---
+<div>
+  <label class={controlLabelClassNames()} for={id}>
+    {label}
+    {required && <span class={requiredMarkClassNames()} aria-hidden="true">*</span>}
+  </label>
+  <input
+    id={id}
+    name={name}
+    type={type}
+    required={required}
+    placeholder={placeholder}
+    autocomplete={autocomplete}
+    class={`${field} ${className}`}
+  />
+</div>

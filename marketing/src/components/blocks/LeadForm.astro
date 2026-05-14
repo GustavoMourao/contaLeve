@@ -3,6 +3,12 @@ import Section from '../primitives/Section.astro';
 import Container from '../primitives/Container.astro';
 import Heading from '../primitives/Heading.astro';
 import { BASE_LEAD_FIELDS } from '../../lib/forms';
+import {
+  controlFieldClassNames,
+  controlLabelClassNames,
+  leadFormSubmitButtonClassNames,
+  requiredMarkClassNames,
+} from '../../lib/fieldStyles';
 import type { LeadFormField } from '../../lib/schema';
 
 interface Props {
@@ -29,21 +35,22 @@ const {
   surface = 'muted',
 } = Astro.props;
 
-const inputClass =
-  'mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]';
-
-const labelClass = 'block text-sm font-medium text-[var(--color-fg)]';
-
-const requiredMarkClass = 'text-[var(--color-accent)] ml-0.5';
+const inputClass = controlFieldClassNames();
+const labelClass = controlLabelClassNames();
+const requiredMarkClass = requiredMarkClassNames();
+const submitClass = leadFormSubmitButtonClassNames();
 ---
 <Section surface={surface}>
   <Container class="max-w-xl">
-    <div id={formId} class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-6 sm:p-8">
+    <div
+      id={formId}
+      class="rounded-card border-[2.5px] border-ds-charcoal bg-ds-white p-6 shadow-ds-md sm:p-8"
+    >
       {title && (
         <Heading level={2} class="text-balance">{title}</Heading>
       )}
       {intro && (
-        <p class={`text-[var(--color-muted)] ${title ? 'mt-3' : ''}`}>{intro}</p>
+        <p class={`text-ds-gray ${title ? 'mt-3' : ''}`}>{intro}</p>
       )}
 
       <form
@@ -166,7 +173,7 @@ const requiredMarkClass = 'text-[var(--color-accent)] ml-0.5';
 
         <button
           type="submit"
-          class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--color-cta-bg)] px-5 py-3 text-base font-medium text-[var(--color-cta-fg)] transition-opacity duration-150 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+          class={submitClass}
           data-submit-button
           data-default-label={submitLabel}
         >
@@ -175,7 +182,7 @@ const requiredMarkClass = 'text-[var(--color-accent)] ml-0.5';
 
         <p
           data-lead-error
-          class="hidden text-sm text-red-600"
+          class="hidden text-sm font-medium text-ds-error"
           role="alert"
           aria-live="polite"
         >
@@ -183,7 +190,13 @@ const requiredMarkClass = 'text-[var(--color-accent)] ml-0.5';
         </p>
       </form>
 
-      <div data-lead-success hidden role="status" aria-live="polite" class="mt-4 rounded-md bg-[var(--color-surface)] p-4 text-[var(--color-fg)]">
+      <div
+        data-lead-success
+        hidden
+        role="status"
+        aria-live="polite"
+        class="mt-4 rounded-md border-[2.5px] border-ds-charcoal bg-ds-green p-4 text-ds-charcoal shadow-ds-sm"
+      >
         {successMessage}
       </div>
     </div>

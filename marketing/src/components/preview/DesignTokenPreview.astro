@@ -1,0 +1,236 @@
+---
+import {
+  contentColorAliases,
+  dsBrandGreens,
+  dsCoreColors,
+  dsFonts,
+  dsRadii,
+  dsSemanticLight,
+  dsSemanticVivid,
+  dsSpacing,
+  dsStructure,
+  dsTracking,
+  type ColorTokenRow,
+} from '../../lib/designTokenPreview';
+
+interface Props {
+  lbl: string;
+  /** Scroll target for in-page nav (e.g. `tokens`). */
+  anchorId?: string;
+}
+
+const { lbl, anchorId = 'tokens' } = Astro.props;
+
+function swatchTextClass(row: ColorTokenRow): string {
+  return row.labelOn === 'light' ? 'text-ds-offwhite' : 'text-ds-charcoal';
+}
+---
+
+<section
+  id={anchorId}
+  class="scroll-mt-28 rounded-card border-[2.5px] border-ds-charcoal bg-ds-white p-6 shadow-ds-md sm:p-7 md:col-span-12"
+  aria-labelledby="ds-token-preview-heading"
+>
+  <h2 id="ds-token-preview-heading" class={lbl}>Tokens CSS · referência</h2>
+  <p class="mb-8 max-w-3xl text-xs leading-relaxed text-ds-gray">
+    Valores lidos em tempo real de <code class="font-mono text-ds-charcoal">:root</code>. A lista de variáveis expostas aqui vive em
+    <code class="font-mono text-ds-charcoal">src/lib/designTokenPreview.ts</code> — ao criar um token novo em
+    <code class="font-mono text-ds-charcoal">design-tokens.css</code>, adicione-o a esse ficheiro para aparecer nesta grelha.
+  </p>
+
+  <div class="grid gap-8 lg:grid-cols-2">
+    <!-- Cores -->
+    <div>
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Core</h3>
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {
+          dsCoreColors.map((row) => (
+            <div
+              class="flex min-h-[4.5rem] flex-col justify-end rounded-lg border-2 border-ds-charcoal p-2.5"
+              style={`background: var(${row.cssVar})`}>
+              <span class:list={['text-[10px] font-bold uppercase tracking-wide', swatchTextClass(row)]}>{row.label}</span>
+              <code class:list={['mt-0.5 font-mono text-[10px] opacity-90', swatchTextClass(row)]}>{row.cssVar}</code>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div>
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Marca · verdes</h3>
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {
+          dsBrandGreens.map((row) => (
+            <div
+              class="flex min-h-[3.75rem] flex-col justify-center rounded-lg border-2 border-ds-charcoal p-3"
+              style={`background: var(${row.cssVar})`}>
+              <span class:list={['text-[10px] font-bold uppercase tracking-wide', swatchTextClass(row)]}>{row.label}</span>
+              <code class:list={['mt-0.5 font-mono text-[10px]', swatchTextClass(row)]}>{row.cssVar}</code>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Semântica · base (superfície clara)</h3>
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {
+          dsSemanticLight.map((row) => (
+            <div
+              class="flex min-h-[3.5rem] flex-col justify-end rounded-lg border-2 border-ds-charcoal p-2.5"
+              style={`background: var(${row.cssVar})`}>
+              <span class:list={['text-[10px] font-bold uppercase tracking-wide', swatchTextClass(row)]}>{row.label}</span>
+              <code class:list={['mt-0.5 font-mono text-[10px]', swatchTextClass(row)]}>{row.cssVar}</code>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Semântica · vivid (fundo escuro)</h3>
+      <div class="rounded-lg border-[2.5px] border-ds-charcoal bg-ds-charcoal p-3">
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {
+            dsSemanticVivid.map((row) => (
+              <div
+                class="flex min-h-[3.25rem] flex-col justify-end rounded-md border-2 border-ds-charcoal/30 p-2.5"
+                style={`background: var(${row.cssVar})`}>
+                <span class="text-[10px] font-bold uppercase tracking-wide text-ds-charcoal">{row.label}</span>
+                <code class="mt-0.5 font-mono text-[9px] text-ds-charcoal/80">{row.cssVar}</code>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Aliases -->
+    <div class="lg:col-span-2">
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Aliases de conteúdo (--color-*)</h3>
+      <div class="flex flex-wrap gap-2">
+        {
+          contentColorAliases.map((row) => (
+            <div
+              class="inline-flex min-w-[7.5rem] flex-col rounded-md border-2 border-ds-charcoal px-2.5 py-2"
+              style={`background: var(${row.cssVar})`}>
+              <span
+                class:list={[
+                  'text-[9px] font-bold uppercase tracking-wide',
+                  row.chipText === 'light' ? 'text-ds-offwhite' : 'text-ds-charcoal',
+                ]}>
+                {row.label}
+              </span>
+              <code
+                class:list={[
+                  'mt-0.5 font-mono text-[9px]',
+                  row.chipText === 'light' ? 'text-ds-offwhite/90' : 'text-ds-charcoal/80',
+                ]}>
+                {row.cssVar}
+              </code>
+            </div>
+          ))
+        }
+      </div>
+      <p class="mt-2 text-[11px] text-ds-gray">
+        Alguns chips podem parecer iguais (ex. <code class="font-mono">--color-bg</code> e branco) — o valor resolve-se a partir de
+        <code class="font-mono">design-tokens.css</code>.
+      </p>
+    </div>
+
+    <!-- Structure -->
+    <div class="lg:col-span-2">
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Estrutura · borda e sombra</h3>
+      <div class="grid gap-4 sm:grid-cols-3">
+        {
+          dsStructure.map((row) => (
+            <div class="rounded-md border-2 border-ds-charcoal bg-ds-offwhite p-3">
+              <code class="block font-mono text-[10px] font-semibold text-ds-charcoal">{row.cssVar}</code>
+              <p class="mt-1 text-[10px] font-bold uppercase tracking-wide text-ds-gray">{row.label}</p>
+              {row.hint && <p class="mt-0.5 text-[10px] text-ds-gray">{row.hint}</p>}
+              {row.cssVar === '--ds-border-width' ? (
+                <div class="mt-3 h-14 rounded-md border-[length:var(--ds-border-width)] border-ds-charcoal bg-ds-white" />
+              ) : (
+                <div
+                  class="mt-3 flex h-14 items-center justify-center rounded-md border-[2.5px] border-ds-charcoal bg-ds-white text-[10px] font-bold uppercase text-ds-gray"
+                  style={`box-shadow: var(${row.cssVar})`}>
+                  Aa
+                </div>
+              )}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Radii -->
+    <div>
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Raios</h3>
+      <div class="space-y-2">
+        {
+          dsRadii.map((row) => (
+            <div class="flex items-center gap-3">
+              <div
+                class="h-12 w-12 shrink-0 border-2 border-ds-charcoal bg-ds-green"
+                style={`border-radius: var(${row.cssVar})`}
+              />
+              <div>
+                <code class="font-mono text-[11px] font-semibold text-ds-charcoal">{row.cssVar}</code>
+                <p class="text-[10px] text-ds-gray">{row.hint}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Spacing -->
+    <div>
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Espaçamento (--ds-space-*)</h3>
+      <div class="space-y-2">
+        {
+          dsSpacing.map((row) => (
+            <div class="flex items-center gap-3">
+              <div class="h-3 shrink-0 rounded-sm border border-ds-charcoal bg-ds-green-vivid" style={`width: var(${row.cssVar})`} />
+              <div class="min-w-0">
+                <code class="font-mono text-[11px] font-semibold text-ds-charcoal">{row.cssVar}</code>
+                <span class="ml-2 text-[10px] text-ds-gray">{row.hint}</span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Tracking + fonts -->
+    <div class="lg:col-span-2">
+      <h3 class="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ds-gray">Tipografia · variáveis</h3>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {
+          dsFonts.map((row) => (
+            <div class="rounded-md border-2 border-ds-charcoal bg-ds-offwhite p-4">
+              <code class="font-mono text-[10px] text-ds-gray">{row.cssVar}</code>
+              <p class="mt-2 text-xl font-semibold text-ds-charcoal" style={`font-family: var(${row.cssVar})`}>
+                {row.sample}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="mt-4 grid gap-2 sm:grid-cols-2">
+        {
+          dsTracking.map((row) => (
+            <div class="rounded-md border border-ds-charcoal bg-ds-white px-3 py-2">
+              <code class="font-mono text-[10px] text-ds-gray">{row.cssVar}</code>
+              <p class="font-display text-lg font-black text-ds-charcoal" style={`letter-spacing: var(${row.cssVar})`}>
+                Tracking sample
+              </p>
+              <p class="text-[10px] text-ds-gray">{row.hint}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

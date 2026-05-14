@@ -1,0 +1,130 @@
+---
+import '../../styles/global.css';
+import '../../styles/docs-markdown.css';
+import { getCollection } from 'astro:content';
+
+import PreviewTopNav from '../preview/PreviewTopNav.astro';
+import { handbookNavTitle } from '../../lib/handbookNav';
+
+interface Props {
+  title: string;
+  currentSlug: string | null;
+  description?: string;
+}
+
+const { title, currentSlug, description } = Astro.props;
+
+const handbook = (await getCollection('handbook')).sort((a, b) => a.id.localeCompare(b.id));
+
+const pageTitle = currentSlug ? `${title} — Handbook` : `${title} — Preview`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Epilogue:wght@200;300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-[var(--color-surface)] text-[var(--color-fg)]">
+    <PreviewTopNav current="docs" />
+    <div class="mx-auto flex min-h-screen w-full max-w-[1200px] gap-0 px-4 py-8 sm:px-6 lg:gap-10 lg:px-8">
+      <aside class="hidden w-56 shrink-0 lg:block">
+        <div class="sticky top-8 space-y-6">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-ds-gray">Preview</p>
+            <p class="mt-1 font-display text-lg font-black tracking-[var(--ds-tracking-tight)]">Handbook</p>
+            <p class="mt-2 text-xs leading-snug text-ds-gray">
+              English docs from <code class="rounded bg-ds-offwhite px-1 font-mono text-[10px]">docs/marketing/</code>
+            </p>
+          </div>
+          <nav aria-label="Handbook">
+            <ul class="space-y-1 border-t-[2.5px] border-ds-charcoal pt-4">
+              <li>
+                <a
+                  href="/docs"
+                  class:list={[
+                    'block rounded-md px-2 py-1.5 text-sm font-medium transition-colors',
+                    currentSlug === null
+                      ? 'bg-ds-green text-ds-charcoal'
+                      : 'text-ds-charcoal hover:bg-ds-white',
+                  ]}
+                >
+                  Index
+                </a>
+              </li>
+              {
+                handbook.map((e) => {
+                  const sid = e.id.replace(/\.md$/i, '');
+                  const active = sid === currentSlug;
+                  return (
+                    <li>
+                      <a
+                        href={`/docs/${sid}`}
+                        class:list={[
+                          'block rounded-md px-2 py-1.5 text-sm transition-colors',
+                          active
+                            ? 'bg-ds-green font-semibold text-ds-charcoal'
+                            : 'font-medium text-ds-charcoal hover:bg-ds-white',
+                        ]}
+                      >
+                        {handbookNavTitle(sid)}
+                      </a>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </nav>
+          <div class="border-t border-ds-charcoal/20 pt-4 text-[10px] leading-snug text-ds-gray">
+            Switch preview area using the top navigation.
+          </div>
+        </div>
+      </aside>
+
+      <div class="min-w-0 flex-1">
+        <header class="mb-8 border-b-[2.5px] border-ds-charcoal pb-6 lg:hidden">
+          <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-ds-gray">Handbook</p>
+          {
+            currentSlug === null && (
+              <h1 class="mt-2 font-display text-2xl font-black tracking-[var(--ds-tracking-tight)]">{title}</h1>
+            )
+          }
+        </header>
+
+        <header class="mb-8 hidden border-b-[2.5px] border-ds-charcoal pb-6 lg:block">
+          <nav class="text-xs font-semibold text-ds-gray" aria-label="Breadcrumb">
+            <a href="/" class="text-ds-charcoal underline underline-offset-2 hover:opacity-80">Home</a>
+            <span aria-hidden="true"> / </span>
+            <a href="/docs" class="text-ds-charcoal underline underline-offset-2 hover:opacity-80">Docs</a>
+            {
+              currentSlug && (
+                <>
+                  <span aria-hidden="true"> / </span>
+                  <span class="text-ds-charcoal">{title}</span>
+                </>
+              )
+            }
+          </nav>
+          {
+            currentSlug === null && (
+              <h1 class="mt-3 font-display text-3xl font-black tracking-[var(--ds-tracking-tight)]">{title}</h1>
+            )
+          }
+        </header>
+
+        <main id="main">
+          <slot />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
