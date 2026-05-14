@@ -8,6 +8,46 @@ export interface Bill {
   created_at: string;
 }
 
+// ---------------------------------------------------------------------------
+// Hybrid extraction types
+// ---------------------------------------------------------------------------
+
+export type FieldStatus = "extracted" | "uncertain" | "missing";
+
+export interface ExtractedField {
+  value: string | null;
+  status: FieldStatus;
+  confidence: number;   // 0.0 – 1.0
+  hint: string | null;
+}
+
+export interface BillParseResponse {
+  bill_id: number;
+  extraction_status: "complete" | "partial" | "manual_required";
+  fields: {
+    utility: ExtractedField;
+    consumer_unit: ExtractedField;
+    monthly_kwh: ExtractedField;
+    total_cost: ExtractedField;
+    tariff: ExtractedField;
+  };
+  message: string;
+  next_action: "simulate" | "confirm_fields";
+}
+
+export interface BillConfirmRequest {
+  monthly_kwh: number;
+  total_cost: number;
+  tariff?: number;
+  utility?: string;
+  consumer_unit?: string;
+}
+
+export interface BillConfirmResponse {
+  bill: Bill;
+  simulation: SimulationResponse | null;
+}
+
 export interface Supplier {
   id: number;
   name: string;

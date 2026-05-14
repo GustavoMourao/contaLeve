@@ -1,7 +1,11 @@
 from pydantic import BaseModel, field_serializer
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 
+
+# ---------------------------------------------------------------------------
+# Core bill DB model
+# ---------------------------------------------------------------------------
 
 class BillBase(BaseModel):
     monthly_kwh: float
@@ -28,6 +32,51 @@ class BillResponse(BillBase):
             return value.isoformat()
         return value
 
+
+# ---------------------------------------------------------------------------
+# Hybrid extraction – per-field confidence
+# ---------------------------------------------------------------------------
+
+FieldStatus = Literal["extracted", "uncertain", "missing"]
+
+
+class ExtractedField(BaseModel):
+    """Represents one field extracted (or not) from the bill."""
+    value: Optional[str] = None          # always string for transport; caller casts
+    status: FieldStatus = "missing"
+    confidence: float = 0.0              # 0.0 – 1.0
+    hint: Optional[str] = None           # human-readable tip shown in UI
+
+
+class BillParseResponse(BaseModel):
+    """
+    Returned by POST /bills/parse.
+    Carries per-field extraction results so the frontend can show
+    a hybrid confirmation form.
+    """
+    bill_id: int
+    extraction_status: Literal["complete", "partial", "manual_required"]
+    # per-field results
+    fields: dict[str, ExtractedField]
+    message: str
+    next_action: Literal["simulate", "confirm_fields"]
+
+
+class BillConfirmRequest(BaseModel):
+    """
+    Sent by the user after reviewing/correcting the extracted values.
+    POST /bills/{id}/confirm
+    """
+    monthly_kwh: float
+    total_cost: float
+    tariff: Optional[float] = None
+    utility: Optional[str] = None
+    consumer_unit: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Legacy response kept for backwards-compatibility with /upload-bill
+# ---------------------------------------------------------------------------
 
 class UploadBillResponse(BaseModel):
     bill: BillResponse
