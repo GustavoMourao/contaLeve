@@ -1,6 +1,62 @@
-import { UploadBillResponse, SimulationResponse, Supplier, Partner, LeadCreate, LeadResponse } from "./types";
+import {
+  UploadBillResponse,
+  SimulationResponse,
+  Supplier,
+  Partner,
+  LeadCreate,
+  LeadResponse,
+  BillParseResponse,
+  BillConfirmRequest,
+  BillConfirmResponse,
+} from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// ---------------------------------------------------------------------------
+// New hybrid-extraction API
+// ---------------------------------------------------------------------------
+
+/**
+ * POST /bills/parse
+ * Upload a bill and get per-field extraction results.
+ */
+export async function parseBill(file: File): Promise<BillParseResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${API_BASE}/bills/parse`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(error.detail ?? "Falha ao processar a conta.");
+  }
+  return res.json();
+}
+
+/**
+ * POST /bills/{id}/confirm
+ * User confirms / corrects extracted values → returns bill + simulation.
+ */
+export async function confirmBill(
+  billId: number,
+  payload: BillConfirmRequest
+): Promise<BillConfirmResponse> {
+  const res = await fetch(`${API_BASE}/bills/${billId}/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(error.detail ?? "Falha ao confirmar os dados.");
+  }
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Legacy / unchanged endpoints
+// ---------------------------------------------------------------------------
 
 export async function uploadBill(file: File): Promise<UploadBillResponse> {
   const form = new FormData();
