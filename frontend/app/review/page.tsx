@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { UploadBillResponse } from "@/lib/types";
 import { simulate } from "@/lib/api";
 
 export default function ReviewBillPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [billData, setBillData] = useState<UploadBillResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,9 +23,12 @@ export default function ReviewBillPage() {
       setBillData(data);
       setMonthly_kwh(data.bill.monthly_kwh || 0);
       setTotal_cost(data.bill.total_cost || 0);
+    } else {
+      // No bill data found, redirect back to home
+      router.push("/");
     }
     setLoading(false);
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
