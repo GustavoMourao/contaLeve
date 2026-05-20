@@ -123,3 +123,14 @@ class Lead(Base):
                         onupdate=lambda: datetime.now(timezone.utc))
 
     partner = relationship("Partner", back_populates="leads")
+
+
+class AdminUser(Base):
+    """Admin users who can access the leads dashboard."""
+    __tablename__ = "admin_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    must_change_password = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
