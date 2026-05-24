@@ -8,6 +8,9 @@ import {
   BillParseResponse,
   BillConfirmRequest,
   BillConfirmResponse,
+  AdminTokenResponse,
+  AdminStats,
+  AdminLead,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -131,5 +134,57 @@ export async function updateLeadStatus(
     body: JSON.stringify({ status, notes }),
   });
   if (!res.ok) throw new Error("Failed to update lead");
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Admin API
+// ---------------------------------------------------------------------------
+
+export async function adminLogin(username: string, password: string): Promise<AdminTokenResponse> {
+  const form = new URLSearchParams();
+  form.append("username", username);
+  form.append("password", password);
+  const res = await fetch(`${API_BASE}/admin/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: form.toString(),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Credenciais inválidas." }));
+    throw new Error(err.detail ?? "Erro ao fazer login.");
+  }
+  return res.json();
+}
+
+export async function adminChangePassword(
+  token: string,
+  current_password: string,
+  new_password: string,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/admin/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ current_password, new_password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Erro." }));
+    throw new Error(err.detail ?? "Erro ao alterar senha.");
+  }
+}
+
+export async function adminGetStats(token: string): Promise<AdminStats> {
+  const res = await fetch(`${API_BASE}/admin/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Sem autorização.");
+  return res.json();
+}
+
+export async function adminGetLeads(token: string): Promise<AdminLead[]> {
+  const res = await fetch(`${API_BASE}/admin/leads?limit=500`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Sem autorização.");
   return res.json();
 }

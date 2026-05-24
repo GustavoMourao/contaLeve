@@ -131,3 +131,34 @@ export interface LeadResponse {
   created_at: string;
   updated_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// Admin types
+// ---------------------------------------------------------------------------
+
+export interface AdminTokenResponse {
+  access_token: string;
+  token_type: string;
+  must_change_password: boolean;
+}
+
+export interface AdminStats {
+  total: number;
+  by_voltage: { low: number; medium: number; high: number };
+  by_state: { state: string; count: number }[];
+}
+
+export interface AdminLead {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  state: string | null;
+  city: string | null;
+  voltage_level: string;
+  monthly_kwh: number;
+  current_cost: number;
+  estimated_savings: number | null;
+  status: string;
+  created_at: string;
+}
