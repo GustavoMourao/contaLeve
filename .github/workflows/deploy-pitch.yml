@@ -1,9 +1,9 @@
-# ──────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 # Deploy: marketing site → GitHub Pages
 #
 # Builds the Astro marketing site (marketing/) and deploys the static output
 # to GitHub Pages, making the pitch page available at:
-#   https://gustavomourao.github.io/contaLeve/pitch-nascer-2026
+#   https://nivra.github.io/contaLeve/
 #
 # Triggers:
 #   • Push to main that touches marketing/ or this workflow file
@@ -11,7 +11,7 @@
 #
 # Required repo settings (one-time setup):
 #   Settings → Pages → Source: GitHub Actions
-# ──────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 
 name: Deploy – Pitch Page (GitHub Pages)
 
@@ -37,7 +37,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── 1. Build ────────────────────────────────────────────────────────────────
+  # ── 1. Build ──────────────────────────────────────────────────────────────
   build:
     name: Build Astro site
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
         env:
           # GitHub Pages project site URL and base path.
           # ↓ Update DEPLOY_SITE if you configure a custom domain.
-          DEPLOY_SITE: https://contaleve.github.io
+          DEPLOY_SITE: https://nivra.github.io
           DEPLOY_BASE: /contaLeve
 
       - name: Configure GitHub Pages
@@ -75,7 +75,7 @@ jobs:
           # Astro's default output directory
           path: marketing/dist
 
-  # ── 2. Deploy ───────────────────────────────────────────────────────────────
+  # ── 2. Deploy ──────────────────────────────────────────────────────────────
   deploy:
     name: Deploy to GitHub Pages
     needs: build
