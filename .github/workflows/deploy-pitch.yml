@@ -36,6 +36,9 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   # ── 1. Build ──────────────────────────────────────────────────────────────
   build:
@@ -45,8 +48,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -54,8 +55,6 @@ jobs:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: marketing/package-lock.json
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: Install dependencies
         working-directory: marketing
@@ -65,26 +64,18 @@ jobs:
         working-directory: marketing
         run: npm run build
         env:
-          # GitHub Pages project site URL and base path.
-          # ↓ Update DEPLOY_SITE if you configure a custom domain.
           DEPLOY_SITE: https://nivra.github.io
           DEPLOY_BASE: /contaLeve
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
-          # Automatically enables Pages with GitHub Actions source if not yet configured.
           enablement: true
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Astro's default output directory
           path: marketing/dist
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
   # ── 2. Deploy ──────────────────────────────────────────────────────────────
   deploy:
@@ -100,5 +91,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
