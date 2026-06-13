@@ -17,10 +17,22 @@ function rehypeMarketingHandbookLinks() {
   };
 }
 
+/**
+ * Deployment configuration.
+ *
+ * Local dev:      no env vars → site=http://localhost:4321, base=/
+ * GitHub Pages:   set DEPLOY_SITE + DEPLOY_BASE in the Actions workflow
+ *                 e.g. DEPLOY_SITE=https://gustavomourao.github.io
+ *                      DEPLOY_BASE=/contaLeve
+ */
+const site = process.env.DEPLOY_SITE ?? 'http://localhost:4321';
+const base = process.env.DEPLOY_BASE ?? '/';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
-  site: 'http://localhost:4321',
+  site,
+  base,
   integrations: [mdx()],
   markdown: {
     rehypePlugins: [rehypeMarketingHandbookLinks],

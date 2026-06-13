@@ -1,0 +1,91 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Deploy: marketing site → GitHub Pages
+#
+# Builds the Astro marketing site (marketing/) and deploys the static output
+# to GitHub Pages, making the pitch page available at:
+#   https://gustavomourao.github.io/contaLeve/pitch-nascer-2026
+#
+# Triggers:
+#   • Push to main that touches marketing/ or this workflow file
+#   • Manual run ("workflow_dispatch") for on-demand re-deploys
+#
+# Required repo settings (one-time setup):
+#   Settings → Pages → Source: GitHub Actions
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: Deploy – Pitch Page (GitHub Pages)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'marketing/**'
+      - '.github/workflows/deploy-pitch.yml'
+  workflow_dispatch:
+
+# Grant the GITHUB_TOKEN the permissions that actions/deploy-pages needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time; cancel the in-flight run if a new commit
+# lands before the current deployment finishes.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # ── 1. Build ────────────────────────────────────────────────────────────────
+  build:
+    name: Build Astro site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: marketing/package-lock.json
+
+      - name: Install dependencies
+        working-directory: marketing
+        run: npm ci
+
+      - name: Build marketing site
+        working-directory: marketing
+        run: npm run build
+        env:
+          # GitHub Pages project site URL and base path.
+          # ↓ Update DEPLOY_SITE if you configure a custom domain.
+          DEPLOY_SITE: https://contaleve.github.io
+          DEPLOY_BASE: /contaLeve
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Astro's default output directory
+          path: marketing/dist
+
+  # ── 2. Deploy ───────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
