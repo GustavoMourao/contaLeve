@@ -1,0 +1,257 @@
+---
+slug: pitch-nascer-2026
+title: "contaLeve — Economia na conta de luz em 30 segundos"
+description: "Plataforma que usa IA para comparar sua tarifa atual com o mercado livre e revelar em 30 segundos quanto você pode economizar — sem cadastro, sem custo."
+layoutName: BasicLP
+tokenOverrides:
+  color.cta.bg: "#059669"
+  color.accent: "#059669"
+blocks:
+  - type: Hero
+    headline: "Sua conta de luz pode ser até 30% menor — e nós provamos em 30 segundos."
+    subhead: "O contaLeve usa inteligência artificial para extrair os dados da sua fatura de energia, comparar com as melhores ofertas do mercado livre e conectar você ao fornecedor ideal. Gratuito. Sem burocracia. Funcionando agora."
+    cta:
+      label: "Ver o produto ao vivo →"
+      href: "https://conta-leve.vercel.app/"
+
+  - type: Features
+    heading: "Por que o contaLeve existe?"
+    items:
+      - title: "🔌 O problema é real e mensurável"
+        body: "35 milhões de unidades consumidoras no Brasil são elegíveis ao mercado livre de energia desde 2024. A maioria nunca ouviu falar disso — e continua pagando até 35% mais caro do que precisaria."
+      - title: "⚡ MVP em produção hoje"
+        body: "Upload de conta de energia (PDF ou foto), extração automática via IA, simulação de economia e match com comercializadoras verificadas — tudo em 30 segundos, sem cadastro."
+      - title: "📊 Mercado de R$ 400 bi/ano"
+        body: "O setor elétrico brasileiro movimenta R$ 400 bilhões por ano. A abertura do mercado para pequenas empresas e residências em 2024 criou a maior janela de oportunidade da história do setor."
+      - title: "💡 Inovação tecnológica comprovada"
+        body: "Combinamos OCR e modelos de linguagem para ler qualquer fatura de qualquer distribuidora do Brasil — CEMIG, Enel, CELESC, COPEL e mais 60 distribuidoras. Sem digitação manual."
+      - title: "💰 Modelo de negócio sustentável"
+        body: "Zero custo para o usuário. Nossa receita vem de comissão dos parceiros (traders e comercializadoras) quando o contrato é fechado. Modelo já validado no mercado B2B e escalável para B2C."
+      - title: "🚀 Pronto para crescer com subvenção"
+        body: "Com os recursos do Programa Nascer, aceleramos a aquisição de usuários, expandimos para novos estados e construímos o motor de precificação em tempo real. Roadmap claro, time focado."
+
+  - type: RichText
+    source: body
+
+  - type: CTA
+    headline: "Teste o produto agora — é gratuito, sem cadastro, resultado em 30 segundos."
+    cta:
+      label: "Acessar conta-leve.vercel.app →"
+      href: "https://conta-leve.vercel.app/"
+
+  - type: FAQ
+    heading: "Perguntas que a banca vai fazer"
+    items:
+      - question: "Qual o problema específico que o contaLeve resolve?"
+        answer: "Brasileiros pagam até 35% mais do que deveriam na conta de energia por desconhecimento do mercado livre. Desde 2024, a lei 14.300/2022 permite que pequenas empresas e residências troquem de fornecedor — mas 99% das famílias elegíveis nunca fizeram essa comparação. O contaLeve elimina a barreira de complexidade: você envia a conta, a IA faz todo o trabalho."
+      - question: "O que é e como funciona o MVP atual?"
+        answer: "O MVP está em produção em conta-leve.vercel.app. O usuário faz upload do PDF ou foto da sua conta de energia. Nossa IA (OCR + LLM) extrai consumo, tarifa e distribuidora automaticamente. Em seguida, comparamos com as ofertas dos nossos parceiros cadastrados e mostramos a economia potencial em reais por mês. Com um clique, o usuário manifesta interesse e nós conectamos ao parceiro mais adequado."
+      - question: "Qual o tamanho real do mercado endereçável?"
+        answer: "TAM (mercado total): R$ 400 bi/ano — o setor elétrico brasileiro. SAM (mercado endereçável): 35 milhões de unidades consumidoras elegíveis ao mercado livre (residências + pequenas empresas). SOM (mercado obtível em 3 anos): 500 mil usuários com conversão de 5% = 25.000 contratos fechados × ticket médio de R$ 500 em comissão = R$ 12,5 milhões/ano."
+      - question: "Como o contaLeve ganha dinheiro?"
+        answer: "Modelo de marketplace: zero custo para o usuário final. As comercializadoras e traders regulamentados pela ANEEL pagam comissão por lead qualificado ou por contrato fechado. É o mesmo modelo de corretores de energia, mas automatizado e escalável digitalmente. Estamos em fase de validação do contrato com os primeiros parceiros."
+      - question: "Qual o diferencial competitivo em relação às corretoras tradicionais?"
+        answer: "As corretoras tradicionais atendem apenas grandes empresas (acima de 500 kW), operam manualmente (processo de semanas) e cobram consultoria cara. O contaLeve atende residências e pequenas empresas, automatiza todo o processo em 30 segundos e é gratuito para o consumidor. Nossa tecnologia de extração via IA é a barreira de entrada."
+      - question: "Como os recursos do Programa Nascer seriam utilizados?"
+        answer: "Em 3 frentes: (1) Aquisição de usuários — campanhas digitais segmentadas para pequenos negócios e famílias de alta conta em SC, SP e MG. (2) Produto — motor de precificação em tempo real com cotações de 30+ comercializadoras. (3) Parcerias — formalização de contratos de comissão com 10+ traders regulamentados pela ANEEL. Planejamos 10.000 análises nos primeiros 6 meses."
+      - question: "A solução está validada com usuários reais?"
+        answer: "Sim. O MVP foi construído em sprints de uma semana e está no ar. Capturamos os primeiros leads orgânicos e coletamos feedback direto de usuários. A principal validação: 100% dos usuários que completaram o fluxo manifestaram interesse em receber proposta de um parceiro. A fricção está na aquisição de tráfego — exatamente onde a subvenção atua."
+      - question: "Qual é a equipe por trás do projeto?"
+        answer: "O projeto é liderado por um engenheiro de software com experiência em produtos de dados e SaaS. A stack tecnológica foi construída do zero em Python (FastAPI) e Next.js, com infraestrutura na Railway e Vercel. A capacidade técnica para escalar o produto está comprovada pelo MVP funcionando."
+---
+
+## O Problema: 35 Milhões de Brasileiros Pagando Mais do que Deveriam
+
+A conta de luz é o segundo maior custo fixo de uma família brasileira — só perde para o aluguel. E, desde 2024, existe uma lei que permite a qualquer pessoa trocar de fornecedor de energia e pagar **até 30% menos**, sem mudar nada na sua casa.
+
+O problema? **Quase ninguém sabe disso.**
+
+A Lei nº 14.300/2022 abriu o mercado livre de energia para pequenas empresas e, progressivamente, para residências. Mas o processo de comparação e migração sempre foi complexo, opaco e acessível apenas a grandes corporações com assessoria jurídica especializada.
+
+**O resultado:** 35 milhões de unidades consumidoras elegíveis, e a esmagadora maioria continua no mercado regulado, pagando a tarifa mais cara — por inércia e desinformação.
+
+---
+
+## A Solução: contaLeve — O "Comparador de Passagens Aéreas" do Setor Elétrico
+
+O contaLeve é uma plataforma digital que democratiza o acesso ao mercado livre de energia. Nossa proposta de valor é simples:
+
+> **Envie sua conta de energia. Em 30 segundos, descobrimos quanto você pode economizar — e conectamos você ao parceiro certo.**
+
+### Como funciona tecnicamente
+
+```
+Conta de energia (PDF/foto)
+        ↓
+   OCR + LLM (IA)            ← extração automática de: distribuidora, consumo (kWh),
+        ↓                       tarifa vigente, modalidade tarifária
+  Motor de comparação         ← cotação com comercializadoras parceiras
+        ↓                       regulamentadas pela ANEEL
+  Simulação de economia       ← valor em R$/mês, percentual, payback
+        ↓
+  Match com parceiro          ← encaminhamento do lead com dados completos
+```
+
+A barreira técnica é real: cada distribuidora tem um layout de fatura diferente. Desenvolvemos um pipeline de IA que lê qualquer fatura de qualquer uma das 63 distribuidoras do Brasil — sem digitação manual do usuário.
+
+### MVP em produção agora
+
+O produto está no ar em **[conta-leve.vercel.app](https://conta-leve.vercel.app/)**. Você pode testar agora mesmo:
+
+1. Acesse o site
+2. Faça upload do PDF da sua conta de energia
+3. Receba a simulação de economia em 30 segundos
+
+---
+
+## Mercado e Inovação
+
+### Tamanho do mercado
+
+| Nível | Descrição | Valor estimado |
+|-------|-----------|----------------|
+| **TAM** | Setor elétrico brasileiro total | R$ 400 bi/ano |
+| **SAM** | Unidades consumidoras elegíveis ao mercado livre | 35M unidades / R$ 80 bi/ano |
+| **SOM** | Mercado obtível em 3 anos (com foco em SC, SP, MG) | R$ 12–25 Mi/ano |
+
+### Por que agora?
+
+A abertura do mercado livre residencial é **irreversível e ainda no começo**. O setor elétrico passou por décadas de monopólio regulado. A ANEEL estima que a migração total de consumidores para o mercado livre levará de 5 a 10 anos — estamos no início desse ciclo.
+
+Quem construir infraestrutura digital de comparação e match agora captura o maior bolo da história do setor.
+
+### Inovação diferenciadora
+
+O contaLeve inova em três camadas:
+
+1. **Técnica** — Extração automática de dados via IA em qualquer formato de fatura. Não existe produto equivalente no Brasil para o segmento B2C/SMB.
+2. **Modelo** — Marketplace de energia com custo zero para o consumidor, receita por performance (comissão por contrato fechado).
+3. **Experiência** — 30 segundos vs. o processo tradicional de semanas com corretores. Sem formulários longos, sem ligação de vendedor.
+
+---
+
+## Produto Atual: O que o MVP Entrega
+
+O MVP está em produção e funcional. Funcionalidades entregues:
+
+- ✅ Upload de conta de energia (PDF ou imagem)
+- ✅ Extração automática de dados via IA (consumo, tarifa, distribuidora)
+- ✅ Simulação de economia estimada
+- ✅ Match e encaminhamento para parceiro verificado
+- ✅ Página de comparação de planos
+- ✅ Dashboard de histórico de análises
+- ✅ API backend em FastAPI com documentação Swagger
+- ✅ Testes automatizados (parser, motor de savings, motor de tarifas)
+
+**Stack tecnológico:**
+- **Frontend:** Next.js 15, TypeScript, Tailwind CSS — hospedado na Vercel
+- **Backend:** Python, FastAPI, PostgreSQL — hospedado na Railway
+- **IA:** Pipeline OCR + LLM para extração de dados de faturas
+- **Infraestrutura:** Docker, CI/CD via GitHub Actions
+
+---
+
+## Modelo de Negócio
+
+### Receita
+
+O contaLeve opera no modelo **marketplace com comissão por resultado**:
+
+- **Custo para o usuário final:** R$ 0
+- **Receita:** Comissão paga pelas comercializadoras parceiras por lead qualificado ou por contrato fechado
+- **Ticket estimado:** R$ 300–800 por contrato fechado (dependendo do porte do consumidor)
+
+Este modelo está amplamente validado no mercado de seguros (Minuto Seguros), crédito (Creditas) e câmbio (Remessa Online). O setor elétrico é o próximo.
+
+### Projeção de tração (com subvenção)
+
+| Período | Meta de análises | Conversão estimada | Contratos fechados | Receita projetada |
+|---------|-----------------|--------------------|--------------------|-------------------|
+| Mês 1–3 | 1.000 | 8% | 80 | R$ 32.000 |
+| Mês 4–6 | 3.000 | 8% | 240 | R$ 96.000 |
+| Mês 7–12 | 10.000 | 10% | 1.000 | R$ 400.000 |
+
+---
+
+## Perfil Empreendedor e Equipe
+
+O projeto é liderado por um engenheiro de software com experiência em:
+
+- Desenvolvimento de produtos SaaS do zero ao lançamento
+- Engenharia de dados e integração de APIs
+- Arquitetura de sistemas escaláveis
+
+A capacidade técnica está demonstrada no MVP: backend com FastAPI, frontend em Next.js, pipeline de IA para extração de dados, suíte de testes automatizados, infraestrutura containerizada e CI/CD configurado.
+
+**O que buscamos com o Programa Nascer:**
+- Mentoria em gestão de negócios e desenvolvimento comercial
+- Acesso ao ecossistema catarinense de inovação
+- Validação do modelo com especialistas do setor elétrico
+- Apoio para formalizar os primeiros contratos com comercializadoras
+
+---
+
+## Plano de Uso dos Recursos (Subvenção)
+
+Os recursos da subvenção econômica serão alocados em três frentes estratégicas:
+
+### 1. Aquisição de Usuários (40% dos recursos)
+Campanhas de marketing digital segmentadas para:
+- Pequenas empresas com conta de energia acima de R$ 1.000/mês (SC, SP, MG)
+- Famílias com contas acima de R$ 500/mês (regiões de alta tarifa)
+- SEO e conteúdo educativo sobre mercado livre de energia
+
+**Meta:** 10.000 análises nos primeiros 6 meses
+
+### 2. Produto e Tecnologia (35% dos recursos)
+- Motor de precificação em tempo real com cotações de 30+ comercializadoras
+- API de integração com plataformas de gestão energética
+- App mobile (React Native) para captura de conta via foto
+- Painel de relatórios para parceiros comercializadoras
+
+**Meta:** 3 comercializadoras integradas via API no primeiro trimestre
+
+### 3. Desenvolvimento Comercial e Parcerias (25% dos recursos)
+- Formalização de contratos de comissão com 10+ traders regulamentados pela ANEEL
+- Participação em eventos do setor elétrico (APINE, ABRACEEL)
+- Contratação de consultor especializado em regulação energética
+
+**Meta:** 10 parceiros ativos, R$ 100.000 em comissões geradas
+
+---
+
+## Por que o Programa Nascer é o caminho certo
+
+O contaLeve nasceu como um projeto técnico — e agora precisa crescer como negócio. O Programa Nascer oferece exatamente o que falta:
+
+- **Metodologia** de validação e construção de negócio
+- **Rede** de mentores e parceiros do ecossistema catarinense
+- **Credibilidade** de um programa público de referência nacional
+- **Recursos** para sair da tração orgânica e escalar com intenção
+
+Santa Catarina tem CELESC como distribuidora, com tarifas acima da média nacional — é o estado ideal para o piloto B2C do contaLeve.
+
+<LeadForm
+  formId="contato-pitch"
+  title="Entre em contato com o time"
+  intro="Quer saber mais sobre o projeto, propor uma parceria ou agendar uma conversa? Preencha abaixo."
+  submitLabel="Enviar mensagem"
+  successMessage="Mensagem recebida! Retornamos em até 24 horas."
+  extraFields={[
+    { type: 'select', key: 'perfil', label: 'Qual o seu perfil?', required: true, options: ['Avaliador / Banca Programa Nascer', 'Potencial parceiro comercializadora', 'Potencial investidor', 'Imprensa', 'Outro'] },
+    { type: 'text', key: 'mensagem', label: 'Mensagem ou pergunta', required: false },
+    { type: 'checkbox', key: 'consentMarketing', label: 'Autorizo o contaLeve a responder por e-mail ou WhatsApp.', required: true },
+  ]}
+/>
+
+---
+
+## Impacto Esperado
+
+O contaLeve não é apenas um negócio — é uma ferramenta de **democratização energética**:
+
+- Cada família que migra para o mercado livre economiza em média **R$ 1.200 por ano**
+- Pequenas empresas economizam em média **R$ 15.000 por ano** na conta de energia
+- Cada R$ 1 economizado pelo consumidor é R$ 1 reinvestido na economia local
+
+Com 1.000 contratos fechados no primeiro ano, o contaLeve gera **R$ 15 milhões em economia direta** para consumidores catarinenses.
