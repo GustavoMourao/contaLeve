@@ -212,8 +212,8 @@ export const pageFrontmatterSchema = z.object({
     .regex(/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, {
       message: 'slug must be kebab-case (a-z, 0-9, hyphens; no leading/trailing hyphen)',
     }),
-  title: z.string().min(1).max(65),
-  description: z.string().min(70).max(171),
+  title: z.string().min(1).max(80),
+  description: z.string().min(70).max(180),
   layoutName: z.literal('BasicLP'),
   tokenOverrides: tokenOverridesSchema,
   seo: seoSchema,
