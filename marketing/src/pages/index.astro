@@ -1,11 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
 import '../styles/global.css';
-import PreviewTopNav from '../components/preview/PreviewTopNav.astro';
 
-const icps = await getCollection('icps');
+const steps = [
+  { n: "01", title: "Envio da Conta de Energia", desc: "O usuário faz upload do PDF ou foto da conta de energia. A plataforma funciona com qualquer distribuidora do Brasil." },
+  { n: "02", title: "Simulação Automatizada", desc: "Nossa inteligência artificial extrai consumo e tarifa, comparando automaticamente com ofertas reais do mercado livre de energia." },
+  { n: "03", title: "Conexão com Parceiros", desc: "Com um clique, o interesse do consumidor é encaminhado ao fornecedor mais adequado ao seu perfil, sem custo para o usuário." },
+];
 
-const all = icps.map((entry) => ({ collection: 'icps' as const, entry }));
+const benefits = [
+  { title: "Totalmente Gratuito", desc: "Plataforma 100% gratuita para o consumidor. Modelo de receita baseado em comissão dos parceiros comercializadores." },
+  { title: "Parceiros Verificados", desc: "Trabalho exclusivo com traders e comercializadoras regulamentadas pela ANEEL, garantindo segurança e confiabilidade." },
+  { title: "Resultado Instantâneo", desc: "Análise e simulação de economia em até 30 segundos, sem necessidade de cadastro ou senha." },
+  { title: "Para Todos os Portes", desc: "Atende desde residências até médias e grandes empresas, com parceiros especializados para cada perfil de consumo." },
+];
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -18,32 +25,197 @@ const all = icps.map((entry) => ({ collection: 'icps' as const, entry }));
       href="https://fonts.googleapis.com/css2?family=Epilogue:wght@200;300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Marketing — landing pages</title>
-    <meta name="description" content="Index of locally-built landing pages." />
-    <meta name="robots" content="noindex" />
+    <title>contaLeve - Plataforma de Conexão ao Mercado Livre de Energia</title>
+    <meta name="description" content="Plataforma que conecta consumidores às melhores comercializadoras do mercado livre de energia." />
   </head>
-  <body class="min-h-screen bg-[var(--color-surface)] text-[var(--color-fg)]">
-    <PreviewTopNav current="campaigns" />
-    <main id="main" class="mx-auto max-w-3xl px-6 py-12">
-      <h1 class="font-display text-3xl font-black tracking-[var(--ds-tracking-tight)]">Landing pages disponíveis</h1>
-      <p class="mt-3 text-[var(--color-muted)]">
-        Esta página existe apenas para navegação local. Não é publicada em produção.
-      </p>
-      <ul class="mt-10 divide-y divide-[var(--color-border)] border-t border-b border-[var(--color-border)]">
-        {all.map(({ collection, entry }) => (
-          <li class="py-4">
-            <a
-              href={`/${entry.data.slug}`}
-              class="flex flex-col gap-1 hover:opacity-80 transition-opacity"
-            >
-              <span class="text-lg font-medium">{entry.data.title}</span>
-              <span class="text-sm text-[var(--color-muted)]">
-                {collection} · /{entry.data.slug}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
+  <body class="min-h-screen bg-slate-50">
+    <main class="mx-auto max-w-5xl px-6 py-12">
+      {/* Hero Section */}
+      <section class="text-center mb-20">
+        <div class="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-4 py-2 rounded-full mb-6">
+          🌿 Gratuito · Sem Cadastro · Resultado em 30 Segundos
+        </div>
+        <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 leading-tight max-w-4xl mx-auto mb-6">
+          contaLeve: Democratizando o Acesso ao <span class="text-green-600">Mercado Livre de Energia</span>
+        </h1>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-8">
+          Plataforma digital que conecta consumidores de energia elétrica às melhores comercializadoras 
+          do mercado livre, facilitando a transição e promovendo economia e sustentabilidade.
+        </p>
+        <a 
+          href="https://conta-leve.vercel.app/" 
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-10 py-4 rounded-xl transition-colors shadow-lg"
+        >
+          Acessar Plataforma →
+        </a>
+      </section>
+
+      {/* Problem & Solution */}
+      <section class="mb-20">
+        <div class="bg-white rounded-2xl p-8 md:p-10 border border-slate-200 shadow-sm">
+          <h2 class="text-3xl font-extrabold text-slate-900 mb-6">O Problema</h2>
+          <p class="text-slate-600 leading-relaxed mb-6">
+            O mercado livre de energia no Brasil oferece economia média de 15-30% para consumidores, 
+            mas o processo de migração é complexo, burocrático e pouco acessível para pequenos e médios consumidores. 
+            A falta de informação e a dificuldade em comparar ofertas limitam o acesso aos benefícios deste mercado.
+          </p>
+          
+          <h2 class="text-3xl font-extrabold text-slate-900 mb-6 mt-10">Nossa Solução</h2>
+          <p class="text-slate-600 leading-relaxed">
+            O <strong>contaLeve</strong> é uma plataforma tecnológica que simplifica radicalmente o processo. 
+            Utilizando inteligência artificial para análise automatizada de contas de energia e um marketplace 
+            de comercializadoras verificadas, eliminamos barreiras e democratizamos o acesso ao mercado livre.
+          </p>
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section class="mb-20">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-extrabold text-slate-900 mb-3">Como Funciona a Plataforma</h2>
+          <p class="text-slate-600 text-lg">Três etapas simples para conectar consumidor e fornecedor</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {steps.map((s) => (
+            <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
+                  <span class="text-green-700 font-bold text-lg">{s.n}</span>
+                </div>
+              </div>
+              <h3 class="font-bold text-slate-900 text-xl mb-3">{s.title}</h3>
+              <p class="text-slate-600 leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Benefits & Differentials */}
+      <section class="mb-20">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-extrabold text-slate-900 mb-3">Diferenciais Competitivos</h2>
+          <p class="text-slate-600 text-lg">Características que tornam o contaLeve único no mercado</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {benefits.map((b) => (
+            <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+              <h3 class="font-bold text-slate-900 text-xl mb-3">{b.title}</h3>
+              <p class="text-slate-600 leading-relaxed">{b.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Impact & Metrics */}
+      <section class="mb-20">
+        <div class="bg-gradient-to-br from-green-600 to-emerald-700 rounded-3xl p-10 md:p-12 text-white">
+          <h2 class="text-4xl font-extrabold mb-6 text-center">Impacto Social e Ambiental</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div class="text-center">
+              <div class="text-5xl font-extrabold mb-2">15-30%</div>
+              <div class="text-green-100">Economia média na conta de energia</div>
+            </div>
+            <div class="text-center">
+              <div class="text-5xl font-extrabold mb-2">100%</div>
+              <div class="text-green-100">Digital e sem burocracia</div>
+            </div>
+            <div class="text-center">
+              <div class="text-5xl font-extrabold mb-2">0 R$</div>
+              <div class="text-green-100">Custo para o consumidor</div>
+            </div>
+          </div>
+          <p class="text-green-50 text-center mt-8 max-w-3xl mx-auto leading-relaxed">
+            Ao facilitar o acesso ao mercado livre de energia, promovemos competição, redução de custos 
+            para empresas e residências, e incentivamos a adoção de energia renovável e sustentável.
+          </p>
+        </div>
+      </section>
+
+      {/* Technology Stack */}
+      <section class="mb-20">
+        <div class="bg-white rounded-2xl p-8 md:p-10 border border-slate-200 shadow-sm">
+          <h2 class="text-3xl font-extrabold text-slate-900 mb-6">Tecnologia e Infraestrutura</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg mb-3">Frontend</h3>
+              <p class="text-slate-600 leading-relaxed">
+                Next.js com TypeScript, interface responsiva e acessível, 
+                design system consistente, otimizado para performance.
+              </p>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg mb-3">Backend</h3>
+              <p class="text-slate-600 leading-relaxed">
+                FastAPI (Python), APIs RESTful, processamento de documentos com IA, 
+                banco de dados PostgreSQL.
+              </p>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg mb-3">IA e Automação</h3>
+              <p class="text-slate-600 leading-relaxed">
+                Extração inteligente de dados de contas de energia, 
+                algoritmos de matching entre consumidor e fornecedor.
+              </p>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg mb-3">Infraestrutura</h3>
+              <p class="text-slate-600 leading-relaxed">
+                Deploy em cloud (Vercel/Railway), escalável, 
+                alta disponibilidade, monitoramento em tempo real.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Business Model */}
+      <section class="mb-20">
+        <div class="bg-white rounded-2xl p-8 md:p-10 border border-slate-200 shadow-sm">
+          <h2 class="text-3xl font-extrabold text-slate-900 mb-6">Modelo de Negócio Sustentável</h2>
+          <p class="text-slate-600 leading-relaxed mb-6">
+            O contaLeve opera em um modelo <strong>B2B2C</strong> (Business-to-Business-to-Consumer), 
+            onde a plataforma é gratuita para o consumidor final, e a receita é gerada através de:
+          </p>
+          <ul class="space-y-3 text-slate-600">
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold">→</span>
+              <span><strong>Comissão por conversão:</strong> Fee pago pelas comercializadoras quando um lead se converte em cliente</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold">→</span>
+              <span><strong>Planos de assinatura:</strong> Parceiros premium com maior visibilidade e prioridade no matching</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold">→</span>
+              <span><strong>Serviços adicionais:</strong> Análises avançadas, consultoria e ferramentas para comercializadoras</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section class="text-center">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-10 md:p-14 text-white">
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Acesse a Plataforma</h2>
+          <p class="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
+            Visite o contaLeve e descubra como estamos transformando o acesso ao mercado livre de energia no Brasil.
+          </p>
+          <a 
+            href="https://conta-leve.vercel.app/" 
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-10 py-4 rounded-xl transition-colors shadow-lg"
+          >
+            https://conta-leve.vercel.app/ →
+          </a>
+          <p class="text-slate-400 text-sm mt-6">
+            Plataforma em produção · Funcionando 24/7 · Pronta para escalar
+          </p>
+        </div>
+      </section>
+
     </main>
   </body>
 </html>
