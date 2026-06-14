@@ -3,7 +3,7 @@
 #
 # Builds the Astro marketing site (marketing/) and deploys the static output
 # to GitHub Pages, making the pitch page available at:
-#   https://gustavomourao.github.io/nivra/
+#   https://gustavomourao.github.io/contaLeve/
 #
 # Triggers:
 #   • Push to main that touches marketing/ or this workflow file
@@ -65,7 +65,7 @@ jobs:
         run: npm run build
         env:
           DEPLOY_SITE: https://gustavomourao.github.io
-          DEPLOY_BASE: /nivra
+          DEPLOY_BASE: /contaLeve
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
